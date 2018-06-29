@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../actions';
-import Page from '../../components/page';
 
 type Props = typeof actionCreators;
 
@@ -18,7 +17,7 @@ class Other extends React.Component<Props> {
   }
 
   render() {
-    return <Page title="Other Page" linkTo="/" NavigateTo="Index Page" />;
+    return <div />;
   }
 }
 
