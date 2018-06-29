@@ -9,6 +9,7 @@
     "@babel/core": "7.0.0-beta.42",
     "@zeit/next-typescript": "~1.1.0",
     "babel-loader": "^7.1.4",
+    "cross-env": "^5.2.0",
     "es6-promise": "4.1.1",
     "isomorphic-unfetch": "2.0.0",
     "next": "^6.0.3",
@@ -19,10 +20,9 @@
     "react-redux": "5.0.7",
     "redux": "4.0.0",
     "redux-saga": "0.16.0",
+    "styled-components": "^2.1.0",
     "typescript": "~2.9.2",
-    "typescript-babel-jest": "^1.0.5",
-    "cross-env": "^5.2.0",
-    "styled-components": "^2.1.0"
+    "typescript-babel-jest": "^1.0.5"
   },
   "devDependencies": {
     "@types/next": "^2.4.12",

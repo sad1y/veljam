@@ -1,5 +1,5 @@
 import Document, { Head, Main, NextScript } from 'next/document';
-import { ServerStyleSheet } from 'styled-components';
+import styled, { ServerStyleSheet } from 'styled-components';
 
 export default class VeljamDocument extends Document {
   static getInitialProps({ renderPage }) {
@@ -11,16 +11,30 @@ export default class VeljamDocument extends Document {
 
   render() {
     return (
-      <html>
+      <Html>
         <Head>
           <title>Veljam</title>
           {this.props.styleTags}
         </Head>
-        <body>
+        <Body>
           <Main />
           <NextScript />
-        </body>
-      </html>
+        </Body>
+      </Html>
     );
   }
 }
+
+const Html = styled.html`
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+`;
+
+const Body = styled.body`
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+`;

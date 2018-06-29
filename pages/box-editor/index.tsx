@@ -2,26 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../actions';
+import Layout from './components/Layout';
 
 type Props = typeof actionCreators;
 
-class Other extends React.Component<Props> {
-  static async getInitialProps(props) {
-    const { store, isServer } = props.ctx;
-    store.dispatch(actionCreators.tickClock(isServer));
-    return { isServer };
-  }
-
-  componentDidMount() {
-    this.props.startClock();
-  }
-
+class BoxEditorPage extends React.Component<Props> {
   render() {
-    return <div />;
+    return <Layout />;
   }
 }
 
 export default connect(
   null,
   disptacher => bindActionCreators(actionCreators, disptacher)
-)(Other);
+)(BoxEditorPage);
