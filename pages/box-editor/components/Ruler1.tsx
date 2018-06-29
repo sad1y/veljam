@@ -27,8 +27,8 @@ class Ruler extends React.Component<IProps> {
       ctx.lineTo(x, lineHeight);
     }
 
-    ctx.moveTo(0, this.props.height);
-    ctx.lineTo(lineLen, this.props.height);
+    ctx.moveTo(0, this.props.height - 0.5);
+    ctx.lineTo(lineLen, this.props.height - 0.5);
 
     ctx.lineWidth = 1;
     ctx.stroke();
