@@ -9,18 +9,30 @@
     "@babel/core": "7.0.0-beta.42",
     "@zeit/next-typescript": "~1.1.0",
     "babel-loader": "^7.1.4",
+    "es6-promise": "4.1.1",
+    "isomorphic-unfetch": "2.0.0",
     "next": "^6.0.3",
+    "next-redux-saga": "3.0.0-beta.1",
+    "next-redux-wrapper": "2.0.0-beta.6",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-redux": "5.0.7",
+    "redux": "4.0.0",
+    "redux-saga": "0.16.0",
     "typescript": "~2.9.2",
     "typescript-babel-jest": "^1.0.5",
-    "cross-env": "^5.2.0"
+    "cross-env": "^5.2.0",
+    "styled-components": "^2.1.0"
   },
   "devDependencies": {
-    "@types/next": "^2.4.11",
+    "@types/next": "^2.4.12",
+    "@types/next-redux-wrapper": "^1.4.1",
     "@types/react": "^16.0.36",
+    "@types/react-redux": "^6.0.2",
+    "babel-plugin-styled-components": "^1.5.0",
     "fork-ts-checker-webpack-plugin": "^0.4.2",
     "nodemon": "~1.17.5",
+    "redux-devtools-extension": "2.13.2",
     "ts-node": "^6.1.1"
   }
 }
