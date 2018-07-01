@@ -214,6 +214,8 @@ import StatusPanel from './StatusPanel';
 //   actionCreators // Selects which action creators are merged into the component's props
 // )(StudyMetadataFormEditor);
 
+
+
 export default () => {
   const p = { x: 50, y: 120 };
   return (
@@ -229,7 +231,7 @@ export default () => {
 const Layout = styled.div`
   position: absolute;
   left: 200px;
-  top: 50px;
+  top: 0;
   width: 500px;
   height: 400px;
 `;
