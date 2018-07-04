@@ -214,8 +214,6 @@ import StatusPanel from './StatusPanel';
 //   actionCreators // Selects which action creators are merged into the component's props
 // )(StudyMetadataFormEditor);
 
-
-
 export default () => {
   const p = { x: 50, y: 120 };
   return (
@@ -223,7 +221,8 @@ export default () => {
       {/* <Ruler position="left" containerSize={400} formSize={300} unitSize={10} viewportOffset={0} size={20} />
       <Ruler position="top" containerSize={500} formSize={300} unitSize={10} viewportOffset={0} size={20} /> */}
       {/* <StatusPanel mousePosition={p} scale={1} zoomIn={null} zoomOut={null} /> */}
-      <Ruler1 width={1000} height={20} />
+      <Ruler1 contentSize={1000} height={20} orientation="Horizontal" />
+      <Ruler1 contentSize={1000} height={20} orientation="Vertical" />
     </Layout>
   );
 };

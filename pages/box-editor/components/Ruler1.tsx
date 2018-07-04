@@ -1,8 +1,10 @@
 import * as React from 'react';
 
+type Orientation = 'Horizontal' | 'Vertical';
 interface IProps {
-  width: number;
+  contentSize: number;
   height: number;
+  orientation: Orientation;
 }
 
 const tickHeights = [1.0, 0.6, 0.35, 0.25, 0.1, 0.075];
@@ -10,8 +12,18 @@ const integerSubDivisors = [2.0, 5.0, 2.0];
 const majorDivisors = [2.0, 2.5, 2.0];
 const halfTickThickness = 0.5;
 
-const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLevel, subdivs) => {
-  const tickHeight = height * tickHeights[tickLevel];
+const subdivideX = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  divisionInPixels: number,
+  division: number,
+  index: number,
+  size: number,
+  tickLevel: number,
+  subdivs: number[]
+) => {
+  const tickHeight = size * tickHeights[tickLevel];
 
   const derX = Math.round(x) + halfTickThickness;
   ctx.moveTo(derX, y);
@@ -28,7 +40,7 @@ const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLe
     let subDivIndex = (-index - 1) % integerSubDivisors.length;
     if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
       subDivIndex = 1;
-      height *= 0.6;
+      size *= 0.6;
     }
     if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
     subdiv = integerSubDivisors[subDivIndex];
@@ -41,13 +53,22 @@ const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLe
 
   for (let i = 0; i < subdiv; ++i) {
     const x1 = x + (divisionInPixels * i) / subdiv;
-    subdivideX(ctx, x1, y, divisionInPixels1, division1, index + 1, height, tickLevel + 1, subdivs);
+    subdivideX(ctx, x1, y, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
   }
 };
 
-const subdivideY = (ctx, x, y, divisionInPixels, division, index, width, tickLevel, subdivs) => {
-  const tickHeight = width * tickHeights[tickLevel];
-
+const subdivideY = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  divisionInPixels: number,
+  division: number,
+  index: number,
+  size: number,
+  tickLevel: number,
+  subdivs: number[]
+) => {
+  const tickHeight = size * tickHeights[tickLevel];
   const derY = Math.round(y) + halfTickThickness;
   ctx.moveTo(x, derY);
   ctx.lineTo(x - tickHeight, derY);
@@ -63,7 +84,7 @@ const subdivideY = (ctx, x, y, divisionInPixels, division, index, width, tickLev
     let subDivIndex = (-index - 1) % integerSubDivisors.length;
     if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
       subDivIndex = 1;
-      width *= 0.6;
+      size *= 0.6;
     }
     if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
     subdiv = integerSubDivisors[subDivIndex];
@@ -76,18 +97,25 @@ const subdivideY = (ctx, x, y, divisionInPixels, division, index, width, tickLev
 
   for (let i = 0; i < subdiv; ++i) {
     const y1 = y + (divisionInPixels * i) / subdiv;
-    subdivideX(ctx, x, y1, divisionInPixels1, division1, index + 1, width, tickLevel + 1, subdivs);
+    subdivideY(ctx, x, y1, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
   }
 };
 
-const renderRuler = (ctx, adjustedOffset, width, height) => {
-  const originalPixelsSize = width; // scaleFactor.unscale(height)
+const renderRuler = (
+  ctx: CanvasRenderingContext2D,
+  contentSize: number,
+  size: number,
+  orientation: Orientation,
+  scale: number,
+  adjustedOffset: number
+) => {
+  const originalPixelsSize = contentSize / scale;
   let division = 1.0;
   let majorSkipPower = 0;
   const dpu = 1;
-  let majorDivisionPixels = dpu; // scaleFactor.scale(dpu)
+  let majorDivisionPixels = dpu * scale;
   const subdivisions = null;
-  const offsetPixels = 0; // scaleFactor.scale(offset);
+  const offsetPixels = adjustedOffset * scale;
   let start = -adjustedOffset / dpu - 1;
   let end = (originalPixelsSize - adjustedOffset) / dpu + 1;
 
@@ -100,21 +128,42 @@ const renderRuler = (ctx, adjustedOffset, width, height) => {
 
   let index = start;
 
+  ctx.font = '10px Arial';
+
   while (index <= end) {
     const majorMarkPos = index * majorDivisionPixels + offsetPixels;
-    subdivideX(
-      ctx,
-      majorMarkPos,
-      height - 1,
-      majorDivisionPixels * division,
-      division,
-      -majorSkipPower,
-      height - 1,
-      0,
-      subdivisions
-    );
-    ctx.font = '10px Arial';
-    ctx.fillText(index, majorMarkPos + 2, 8);
+
+    if (orientation === 'Horizontal') {
+      subdivideX(
+        ctx,
+        majorMarkPos,
+        size - 1,
+        majorDivisionPixels * division,
+        division,
+        -majorSkipPower,
+        size - 1,
+        0,
+        subdivisions
+      );
+
+      ctx.fillText(index.toString(), majorMarkPos + 2, 8);
+    } else {
+      ctx.restore();
+      subdivideY(
+        ctx,
+        size - 1,
+        majorMarkPos,
+        majorDivisionPixels * division,
+        division,
+        -majorSkipPower,
+        size - 1,
+        0,
+        subdivisions
+      );
+
+      ctx.fillText(index.toString(), 2, majorMarkPos - 2);
+    }
+
     index += division;
   }
 };
@@ -127,26 +176,33 @@ class Ruler extends React.Component<IProps> {
     this.canvas = React.createRef();
   }
 
-  drawTop(canvas: HTMLCanvasElement) {
+  draw(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
 
-    renderRuler(ctx, 100, this.props.width, this.props.height);
+    renderRuler(ctx, this.props.contentSize, this.props.height, this.props.orientation, 1, 0);
 
-    ctx.lineWidth = 1;
     ctx.stroke();
   }
 
   componentDidMount() {
-    this.drawTop(this.canvas.current);
+    this.draw(this.canvas.current);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    // Ruler.draw(this.canvas.current);
-  }
+  componentDidUpdate(prevProps, prevState, snapshot) {}
 
   render() {
-    return <canvas ref={this.canvas} width={this.props.width} height={this.props.height} />;
+    let contentSize, height;
+
+    if (this.props.orientation === 'Horizontal') {
+      contentSize = this.props.contentSize;
+      height = this.props.height;
+    } else {
+      contentSize = this.props.height;
+      height = this.props.contentSize;
+    }
+
+    return <canvas ref={this.canvas} width={contentSize} height={height} />;
   }
 }
 
