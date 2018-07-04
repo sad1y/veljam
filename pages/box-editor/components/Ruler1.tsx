@@ -5,70 +5,86 @@ interface IProps {
   height: number;
 }
 
-const majorDivisors = [2, 2.5, 2];
+const tickHeights = [1.0, 0.6, 0.35, 0.25, 0.1, 0.075];
+const integerSubDivisors = [2.0, 5.0, 2.0];
+const majorDivisors = [2.0, 2.5, 2.0];
+const halfTickThickness = 0.5;
 
-const subdivideX = (ctx, x, delta, index, y, height, subdivs) => {
+const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLevel, subdivs) => {
+  const tickHeight = height * tickHeights[tickLevel];
 
-  ctx.moveTo(x, y - 0.5);
-  ctx.lineTo(x, y + height - 0.5);
-  console.log({ x, y, delta, index })
+  const derX = Math.round(x) + halfTickThickness
+  ctx.moveTo(derX, y);
+  ctx.lineTo(derX, y - tickHeight);
 
-  if (index > 10) {
-    return;
-  }
+  if (index > 10 || tickLevel >= 5) return;
 
-  let div = 0;
+  let subdiv = 0;
 
   if (subdivs != null && index >= 0) {
-    div = subdivs[index % subdivs.Length];
-  }
-  else if (index < 0) {
-    div = majorDivisors[(-index - 1) % majorDivisors.length];
-  }
-  else {
-    return;
-  }
-
-  for (let i = 0; i < div; i++) {
-    if ((delta / div) > 3.5) {
-      subdivideX(ctx, x + delta * i / div, delta / div, index + 1, y, height / div, subdivs);
+    subdiv = subdivs[index % subdivs.length];
+  } else {
+    if (index >= 0) return;
+    let subDivIndex = (-index - 1) % integerSubDivisors.length;
+    if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
+      subDivIndex = 1;
+      height *= 0.6;
     }
+    if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
+    subdiv = integerSubDivisors[subDivIndex];
   }
-}
 
-const renderRuler = (ctx, offset, width, height) => {
-  let majorSkip = 1;
+  const divisionInPixels1 = divisionInPixels / subdiv;
+  const division1 = division / subdiv;
+
+  if ((subdivs == null && division1 != Math.round(division1)) || divisionInPixels1 <= 6.5) return;
+
+  for (let i = 0; i < subdiv; ++i) {
+    const x1 = x + (divisionInPixels * i) / subdiv;
+    subdivideX(ctx, x1, y, divisionInPixels1, division1, index + 1, height, tickLevel + 1, subdivs);
+  }
+};
+
+const renderRuler = (ctx, adjustedOffset, width, height) => {
+  const originalPixelsSize = width; // scaleFactor.unscale(height)
+  let division = 1.0;
   let majorSkipPower = 0;
-  const majorDivisionLength = 8;
-  let majorDivisionPixels = majorDivisionLength * 1; // ScaleFactor.ScaleScalar(majorDivisionLength);
-  const subdivs = null;
-  const offsetPixels = 0;
-  let startMajor = (offset / majorDivisionLength) - 1;
-  let endMajor = ((offset + width) / majorDivisionLength) + 1;
+  const dpu = 1;
+  let majorDivisionPixels = dpu; // scaleFactor.scale(dpu)
+  const subdivisions = null;
+  const offsetPixels = 0; // scaleFactor.scale(offset);
+  let start = -adjustedOffset / dpu - 1;
+  let end = (originalPixelsSize - adjustedOffset) / dpu + 1;
 
-  console.log(endMajor);
-
-  while (majorDivisionPixels * majorSkip < 60) {
-    majorSkip *= majorDivisors[majorSkipPower % majorDivisors.length];
+  while (majorDivisionPixels * division < 60.0) {
+    division *= majorDivisors[majorSkipPower % majorDivisors.length];
     ++majorSkipPower;
   }
 
-  startMajor = (majorSkip * Math.floor(startMajor / majorSkip));
+  start = division * Math.floor(start / division);
 
-  for (let major = startMajor; major <= endMajor; major += majorSkip) {
-    let majorMarkPos = (major * majorDivisionPixels) - offsetPixels;
-    const majorText = major.toString();
-    console.log(majorText);
+  let index = start;
 
-    
-    // SubdivideX(e.Graphics, pen, ClientRectangle.Left + majorMarkPos, majorDivisionPixels * majorSkip, -majorSkipPower, ClientRectangle.Top, ClientRectangle.Height, subdivs);
-    subdivideX(ctx, majorMarkPos, majorDivisionPixels * majorSkip, -majorSkipPower, 0, /* ClientRectangle.Height */ height, subdivs);
-    // e.Graphics.DrawString(majorText, Font, textBrush, new PointF(ClientRectangle.Left + majorMarkPos, ClientRectangle.Bottom), textFormat);
+  // console.log({ start, end, index, division, majorDivisionPixels, majorSkipPower });
 
-    ctx.font = '12px Arial';
-    ctx.fillText(majorText, majorMarkPos + 5, 15);
+  while (index <= end) {
+    const majorMarkPos = index * majorDivisionPixels + offsetPixels;
+    subdivideX(
+      ctx,
+      majorMarkPos,
+      height - 1,
+      majorDivisionPixels * division,
+      division,
+      -majorSkipPower,
+      height - 1,
+      0,
+      subdivisions
+    );
+    ctx.font = '10px Arial';
+    ctx.fillText(index, majorMarkPos + 2, 8);
+    index += division;
   }
-}
+};
 
 class Ruler extends React.Component<IProps> {
   canvas: React.RefObject<HTMLCanvasElement>;
@@ -80,27 +96,12 @@ class Ruler extends React.Component<IProps> {
 
   drawTop(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
-    const lineHeight = this.props.height * 0.75;
-    const lineLen = this.props.width;
-    const space = lineLen / 10;
-
     ctx.beginPath();
 
-    // for (let i = 0; i < 10; i++) {
-    //   const x = i * space + (space - 0.5);
-    //   ctx.moveTo(x, lineLen);
-    //   ctx.lineTo(x, lineHeight);
-    // }
-
-    // ctx.moveTo(0, this.props.height - 0.5);
-    // ctx.lineTo(lineLen, this.props.height - 0.5);
-    renderRuler(ctx, 0, lineLen, this.props.height);
+    renderRuler(ctx, 0, this.props.width, this.props.height);
 
     ctx.lineWidth = 1;
     ctx.stroke();
-
-    // ctx.font = '30px Arial';
-    // ctx.fillText('0', 0, 50);
   }
 
   componentDidMount() {
