@@ -13,7 +13,7 @@ const halfTickThickness = 0.5;
 const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLevel, subdivs) => {
   const tickHeight = height * tickHeights[tickLevel];
 
-  const derX = Math.round(x) + halfTickThickness
+  const derX = Math.round(x) + halfTickThickness;
   ctx.moveTo(derX, y);
   ctx.lineTo(derX, y - tickHeight);
 
@@ -45,6 +45,41 @@ const subdivideX = (ctx, x, y, divisionInPixels, division, index, height, tickLe
   }
 };
 
+const subdivideY = (ctx, x, y, divisionInPixels, division, index, width, tickLevel, subdivs) => {
+  const tickHeight = width * tickHeights[tickLevel];
+
+  const derY = Math.round(y) + halfTickThickness;
+  ctx.moveTo(x, derY);
+  ctx.lineTo(x - tickHeight, derY);
+
+  if (index > 10 || tickLevel >= 5) return;
+
+  let subdiv = 0;
+
+  if (subdivs != null && index >= 0) {
+    subdiv = subdivs[index % subdivs.length];
+  } else {
+    if (index >= 0) return;
+    let subDivIndex = (-index - 1) % integerSubDivisors.length;
+    if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
+      subDivIndex = 1;
+      width *= 0.6;
+    }
+    if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
+    subdiv = integerSubDivisors[subDivIndex];
+  }
+
+  const divisionInPixels1 = divisionInPixels / subdiv;
+  const division1 = division / subdiv;
+
+  if ((subdivs == null && division1 != Math.round(division1)) || divisionInPixels1 <= 6.5) return;
+
+  for (let i = 0; i < subdiv; ++i) {
+    const y1 = y + (divisionInPixels * i) / subdiv;
+    subdivideX(ctx, x, y1, divisionInPixels1, division1, index + 1, width, tickLevel + 1, subdivs);
+  }
+};
+
 const renderRuler = (ctx, adjustedOffset, width, height) => {
   const originalPixelsSize = width; // scaleFactor.unscale(height)
   let division = 1.0;
@@ -64,8 +99,6 @@ const renderRuler = (ctx, adjustedOffset, width, height) => {
   start = division * Math.floor(start / division);
 
   let index = start;
-
-  // console.log({ start, end, index, division, majorDivisionPixels, majorSkipPower });
 
   while (index <= end) {
     const majorMarkPos = index * majorDivisionPixels + offsetPixels;
@@ -98,7 +131,7 @@ class Ruler extends React.Component<IProps> {
     const ctx = canvas.getContext('2d');
     ctx.beginPath();
 
-    renderRuler(ctx, 0, this.props.width, this.props.height);
+    renderRuler(ctx, 100, this.props.width, this.props.height);
 
     ctx.lineWidth = 1;
     ctx.stroke();
