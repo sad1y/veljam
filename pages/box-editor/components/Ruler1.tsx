@@ -59,8 +59,8 @@ const subdivideX = (
 
 const subdivideY = (
   ctx: CanvasRenderingContext2D,
-  x: number,
   y: number,
+  x: number,
   divisionInPixels: number,
   division: number,
   index: number,
@@ -97,9 +97,21 @@ const subdivideY = (
 
   for (let i = 0; i < subdiv; ++i) {
     const y1 = y + (divisionInPixels * i) / subdiv;
-    subdivideY(ctx, x, y1, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
+    subdivideY(ctx, y1, x, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
   }
 };
+
+const deg270 = Math.PI + Math.PI / 2;
+const renderVerticalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) => {
+  ctx.save();
+  ctx.translate(textSize / 2 + 1, 0);
+  ctx.rotate(deg270);
+  ctx.textAlign = "right";
+  ctx.fillText(text, -(offset + 2), 2);
+  ctx.restore();
+}
+const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) => ctx.fillText(text, offset + 2, 8);
+
 
 const renderRuler = (
   ctx: CanvasRenderingContext2D,
@@ -128,41 +140,19 @@ const renderRuler = (
 
   let index = start;
 
-  ctx.font = '10px Arial';
+  const fontSize = size / 2;
+  ctx.font = fontSize + 'px Arial';
+  ctx.textAlign = "left";
+
+  const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
+  const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
+  const divisionInPixels = majorDivisionPixels * division;
 
   while (index <= end) {
-    const majorMarkPos = index * majorDivisionPixels + offsetPixels;
+    const startDivPosition = index * majorDivisionPixels + offsetPixels;
 
-    if (orientation === 'Horizontal') {
-      subdivideX(
-        ctx,
-        majorMarkPos,
-        size - 1,
-        majorDivisionPixels * division,
-        division,
-        -majorSkipPower,
-        size - 1,
-        0,
-        subdivisions
-      );
-
-      ctx.fillText(index.toString(), majorMarkPos + 2, 8);
-    } else {
-      ctx.restore();
-      subdivideY(
-        ctx,
-        size - 1,
-        majorMarkPos,
-        majorDivisionPixels * division,
-        division,
-        -majorSkipPower,
-        size - 1,
-        0,
-        subdivisions
-      );
-
-      ctx.fillText(index.toString(), 2, majorMarkPos - 2);
-    }
+    renderTicks(ctx, startDivPosition, size - 1, divisionInPixels, division, -majorSkipPower, size - 1, 0, subdivisions);
+    renderLabels(ctx, index.toString(), startDivPosition, fontSize);
 
     index += division;
   }
@@ -183,13 +173,26 @@ class Ruler extends React.Component<IProps> {
     renderRuler(ctx, this.props.contentSize, this.props.height, this.props.orientation, 1, 0);
 
     ctx.stroke();
+
+    if (this.props.orientation === 'Horizontal') return;
+
+    //     console.log({ index, majorMarkPos })
+
+    // ctx.textAlign = "right";
+    // ctx.save();
+    // ctx.translate(10, 0);
+    // ctx.rotate(Math.PI + Math.PI / 2);
+
+    // ctx.fillText("12345", -2, 2);
+    // ctx.restore();
+
   }
 
   componentDidMount() {
     this.draw(this.canvas.current);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {}
+  componentDidUpdate(prevProps, prevState, snapshot) { }
 
   render() {
     let contentSize, height;
