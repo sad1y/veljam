@@ -173,19 +173,6 @@ class Ruler extends React.Component<IProps> {
     renderRuler(ctx, this.props.contentSize, this.props.height, this.props.orientation, 1, 0);
 
     ctx.stroke();
-
-    if (this.props.orientation === 'Horizontal') return;
-
-    //     console.log({ index, majorMarkPos })
-
-    // ctx.textAlign = "right";
-    // ctx.save();
-    // ctx.translate(10, 0);
-    // ctx.rotate(Math.PI + Math.PI / 2);
-
-    // ctx.fillText("12345", -2, 2);
-    // ctx.restore();
-
   }
 
   componentDidMount() {
