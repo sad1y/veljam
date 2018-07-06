@@ -1,16 +1,18 @@
 import * as React from 'react';
+import styled from 'styled-components';
 
-interface StatusPanelProps {
+interface IStatusPanelProps {
   scale: number;
   zoomIn: any;
   zoomOut: any;
+  size: number;
   mousePosition: {
     x: number;
     y: number;
   };
 }
 
-const StatusPanel = (props: StatusPanelProps) => {
+const StatusPanel = (props: IStatusPanelProps) => {
   const { mousePosition } = props,
     mouseX = mousePosition ? mousePosition.x : 0,
     mouseY = mousePosition ? mousePosition.y : 0;
@@ -18,7 +20,7 @@ const StatusPanel = (props: StatusPanelProps) => {
   const scale = ~~((props.scale || 1) * 100);
 
   return (
-    <div className="status-panel">
+    <StatusPanelLayout {...props}>
       <span>
         {mouseX}
         {', '}
@@ -29,8 +31,20 @@ const StatusPanel = (props: StatusPanelProps) => {
         <span>{scale}%</span>
         <button onClick={props.zoomIn}>+</button>
       </div>
-    </div>
+    </StatusPanelLayout>
   );
 };
 
 export default StatusPanel;
+
+const StatusPanelLayout = styled.div`
+  position: absolute;
+  height: ${(props: IStatusPanelProps) => props.size}px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: right;
+  .scale-panel {
+    display: inline-block;
+  }
+`;

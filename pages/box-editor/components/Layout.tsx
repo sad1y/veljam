@@ -7,8 +7,7 @@ import { connect } from 'react-redux';
 // // import { actionCreators } from '../../actions/StudyMetadataFormEditor';
 // // import { StudyMetadataFormEditorState } from '../../contracts/StudyMetadataFormEditor';
 
-import Ruler from './Ruler';
-import Ruler1 from './Ruler1';
+import Ruler from './Ruler1';
 import StatusPanel from './StatusPanel';
 
 // // type EditorProps = StudyMetadataFormEditorState & typeof actionCreators;
@@ -214,23 +213,91 @@ import StatusPanel from './StatusPanel';
 //   actionCreators // Selects which action creators are merged into the component's props
 // )(StudyMetadataFormEditor);
 
-export default () => {
-  const p = { x: 50, y: 120 };
-  return (
-    <Layout>
-      {/* <Ruler position="left" containerSize={400} formSize={300} unitSize={10} viewportOffset={0} size={20} />
-      <Ruler position="top" containerSize={500} formSize={300} unitSize={10} viewportOffset={0} size={20} /> */}
-      {/* <StatusPanel mousePosition={p} scale={1} zoomIn={null} zoomOut={null} /> */}
-      <Ruler1 contentSize={1000} height={20} orientation="Horizontal" />
-      <Ruler1 contentSize={1000} height={20} orientation="Vertical" />
-    </Layout>
-  );
-};
+interface IProps {
+  width?: number;
+  height?: number;
+}
 
-const Layout = styled.div`
+interface IState {
+  width: number;
+  height: number;
+  scrollLeft: number;
+  scrollTop: number;
+}
+
+interface IViewProps {
+  offset: number;
+}
+
+export default class Layout extends React.Component<IProps, IState> {
+  viewportEl: HTMLElement;
+  state = {
+    width: 0,
+    height: 0,
+    scrollLeft: 0,
+    scrollTop: 0
+  };
+
+  componentDidMount() {
+    const div = this.viewportEl;
+
+    if (!div) return;
+
+    div.addEventListener('scroll', this.viewportScrollHandler);
+
+    this.setState(() => ({
+      height: div.clientHeight,
+      width: div.clientWidth
+    }));
+  }
+
+  viewportScrollHandler = () => {
+    const viewportEl = this.viewportEl;
+    if (!viewportEl) return;
+
+    const { scrollLeft, scrollTop } = viewportEl;
+
+    if (this.state.scrollLeft === scrollLeft && this.state.scrollTop === scrollTop) {
+      return;
+    }
+
+    this.setState(() => ({ scrollLeft, scrollTop }));
+  };
+
+  render() {
+    const { scrollTop, scrollLeft } = this.state;
+    return (
+      <Frame {...this.props}>
+        <Ruler contentSize={1000} size={20} orientation="Horizontal" offset={scrollTop} />
+        <Ruler contentSize={1000} size={20} orientation="Vertical" offset={scrollLeft} />
+        <Viewport
+          offset={20}
+          innerRef={el => {
+            this.viewportEl = el;
+          }}
+        >
+          {this.props.children}
+        </Viewport>
+        <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={1} zoomIn={null} zoomOut={null} size={20} />
+      </Frame>
+    );
+  }
+}
+
+const Frame = styled.div`
+  position: relative;
+  width: ${(props: IProps) => (props.width ? props.width + 'px' : '100%')};
+  height: ${(props: IProps) => (props.height ? props.height + 'px' : '100%')};
+`;
+
+const Viewport = styled.div`
   position: absolute;
-  left: 200px;
-  top: 0;
-  width: 500px;
-  height: 400px;
+  background-color: red;
+  overflow: auto;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  top: ${(props: IViewProps) => props.offset}px;
+  bottom: ${(props: IViewProps) => props.offset}px;
+  left: ${(props: IViewProps) => props.offset}px;
+  right: 0;
 `;
