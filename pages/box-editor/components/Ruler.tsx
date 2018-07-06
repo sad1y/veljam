@@ -1,139 +1,240 @@
 import * as React from 'react';
-import { TopRulerLine, LeftRulerLine } from './Styles';
+import styled from 'styled-components';
 
-type RulerPosition = 'top' | 'left';
-
-interface RulerProps {
-  position: RulerPosition;
-  containerSize: number;
-  formSize: number;
-  unitSize: number;
+type Orientation = 'Horizontal' | 'Vertical';
+interface IProps {
+  size: number;
+  contentSize: number;
+  height: number;
+  orientation: Orientation;
+  offset: number;
 }
 
-const minClusterSize = 10;
+const tickHeights = [1.0, 0.6, 0.35, 0.25, 0.1, 0.075];
+const integerSubDivisors = [2.0, 5.0, 2.0];
+const majorDivisors = [2.0, 2.5, 2.0];
+const halfTickThickness = 0.5;
 
-const getClusterSize = (unitSize: number): number => {
-  if (unitSize <= 0) return 0;
+const subdivideX = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  divisionInPixels: number,
+  division: number,
+  index: number,
+  size: number,
+  tickLevel: number,
+  subdivs: number[]
+) => {
+  const tickHeight = size * tickHeights[tickLevel];
 
-  let step = 1,
-    multiplier = step;
+  const derX = Math.round(x) + halfTickThickness;
+  ctx.moveTo(derX, y);
+  ctx.lineTo(derX, y - tickHeight);
 
-  while (true) {
-    const nextVal = multiplier * unitSize;
+  if (index > 10 || tickLevel >= 5) return;
 
-    if (nextVal > minClusterSize) return nextVal;
+  let subdiv = 0;
 
-    if (multiplier >= 5) step = 5;
+  if (subdivs != null && index >= 0) {
+    subdiv = subdivs[index % subdivs.length];
+  } else {
+    if (index >= 0) return;
+    let subDivIndex = (-index - 1) % integerSubDivisors.length;
+    if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
+      subDivIndex = 1;
+      size *= 0.6;
+    }
+    if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
+    subdiv = integerSubDivisors[subDivIndex];
+  }
 
-    multiplier += step;
+  const divisionInPixels1 = divisionInPixels / subdiv;
+  const division1 = division / subdiv;
+
+  if ((subdivs == null && division1 != Math.round(division1)) || divisionInPixels1 <= 6.5) return;
+
+  for (let i = 0; i < subdiv; ++i) {
+    const x1 = x + (divisionInPixels * i) / subdiv;
+    subdivideX(ctx, x1, y, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
   }
 };
 
-const getClusterPerGroup = () => {
-  return 10;
-};
+const subdivideY = (
+  ctx: CanvasRenderingContext2D,
+  y: number,
+  x: number,
+  divisionInPixels: number,
+  division: number,
+  index: number,
+  size: number,
+  tickLevel: number,
+  subdivs: number[]
+) => {
+  const tickHeight = size * tickHeights[tickLevel];
+  const derY = Math.round(y) + halfTickThickness;
+  ctx.moveTo(x, derY);
+  ctx.lineTo(x - tickHeight, derY);
 
-const buildClusterSchema = (unitSize: number, containerSize: number, layoutSize: number) => {
-  const clusterSize = getClusterSize(unitSize),
-    clusterPerGroup = getClusterPerGroup(),
-    groupSize = clusterSize * clusterPerGroup,
-    unitPerGroup = groupSize / unitSize,
-    clusterPerLayout = layoutSize / clusterSize,
-    groupPerLayout = Math.ceil(layoutSize / groupSize),
-    offsetSize = (containerSize - layoutSize) / 2,
-    groupPerOffset = Math.ceil(offsetSize / groupSize),
-    staticOffsetSize = groupPerOffset * groupSize - offsetSize,
-    groupPerPage = groupPerLayout + groupPerOffset * 2;
+  if (index > 10 || tickLevel >= 5) return;
 
-  const count = groupPerPage - groupPerOffset,
-    groups = new Array();
+  let subdiv = 0;
 
-  for (let i = -groupPerOffset; count > i; i++) {
-    groups.push(i * unitPerGroup);
+  if (subdivs != null && index >= 0) {
+    subdiv = subdivs[index % subdivs.length];
+  } else {
+    if (index >= 0) return;
+    let subDivIndex = (-index - 1) % integerSubDivisors.length;
+    if (tickLevel == 0 && subDivIndex != 0 && divisionInPixels <= 80.0) {
+      subDivIndex = 1;
+      size *= 0.6;
+    }
+    if (tickLevel == 1 && divisionInPixels >= 40.0) subDivIndex = 1;
+    subdiv = integerSubDivisors[subDivIndex];
   }
 
-  return {
-    staticOffsetSize,
-    clusterPerGroup,
-    clusterSize,
-    groupSize,
-    groups: groups
-  };
+  const divisionInPixels1 = divisionInPixels / subdiv;
+  const division1 = division / subdiv;
+
+  if ((subdivs == null && division1 != Math.round(division1)) || divisionInPixels1 <= 6.5) return;
+
+  for (let i = 0; i < subdiv; ++i) {
+    const y1 = y + (divisionInPixels * i) / subdiv;
+    subdivideY(ctx, y1, x, divisionInPixels1, division1, index + 1, size, tickLevel + 1, subdivs);
+  }
 };
 
-class Ruler extends React.Component<RulerProps, any> {
+const deg270 = Math.PI + Math.PI / 2;
+const renderVerticalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) => {
+  ctx.save();
+  ctx.translate(textSize / 2 + 1, 0);
+  ctx.rotate(deg270);
+  ctx.textAlign = 'right';
+  ctx.fillText(text, -(offset + 2), 4);
+  ctx.restore();
+};
+const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) =>
+  ctx.fillText(text, offset + 2, 10);
+
+const renderRuler = (
+  ctx: CanvasRenderingContext2D,
+  contentSize: number,
+  size: number,
+  orientation: Orientation,
+  scale: number,
+  adjustedOffset: number
+) => {
+  const originalPixelsSize = contentSize / scale;
+  let division = 1.0;
+  let majorSkipPower = 0;
+  const dpu = 1;
+  let majorDivisionPixels = dpu * scale;
+  const subdivisions = null;
+  const offsetPixels = adjustedOffset * scale;
+  let start = -adjustedOffset / dpu - 1;
+  let end = (originalPixelsSize - adjustedOffset) / dpu + 1;
+
+  while (majorDivisionPixels * division < 60.0) {
+    division *= majorDivisors[majorSkipPower % majorDivisors.length];
+    ++majorSkipPower;
+  }
+
+  start = division * Math.floor(start / division);
+
+  let index = start;
+
+  const fontSize = size / 2;
+  ctx.font = fontSize + 'px Arial';
+  ctx.textAlign = 'left';
+
+  const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
+  const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
+  const divisionInPixels = majorDivisionPixels * division;
+
+  while (index <= end) {
+    const startDivPosition = index * majorDivisionPixels + offsetPixels;
+
+    renderTicks(ctx, startDivPosition, size - 1, divisionInPixels, division, -majorSkipPower, size - 1, 0, subdivisions);
+    renderLabels(ctx, index.toString(), startDivPosition, fontSize);
+
+    index += division;
+  }
+};
+
+class Ruler extends React.Component<IProps> {
+  canvas: React.RefObject<HTMLCanvasElement>;
+
   constructor(props) {
     super(props);
+    this.canvas = React.createRef();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const { unitSize, containerSize, formSize } = this.props;
-    const nextUnitSize = nextProps.unitSize,
-      nextContainerSize = nextProps.containerSize,
-      nextFormSize = nextProps.formSize;
+  draw(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
 
-    return unitSize != nextUnitSize || containerSize != nextContainerSize || formSize != nextFormSize;
+    const { contentSize, height, orientation, size } = this.props;
+
+    renderRuler(ctx, size, height, orientation, 1, size - contentSize);
+
+    if (orientation === 'Horizontal') {
+      ctx.moveTo(0, height - halfTickThickness);
+      ctx.lineTo(contentSize, height - halfTickThickness);
+    } else {
+      ctx.moveTo(height - halfTickThickness, 0);
+      ctx.lineTo(height - halfTickThickness, contentSize);
+    }
+
+    ctx.stroke();
   }
+
+  componentDidMount() {
+    this.draw(this.canvas.current);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {}
 
   render() {
-    const { unitSize, containerSize, formSize } = this.props;
-    const clusterSchema = buildClusterSchema(unitSize, containerSize, formSize);
+    let contentSize, size, style, Container;
 
-    const clusterStyle = {},
-      wrapperStyle = {};
-
-    if (this.props.position == 'top') {
-      clusterStyle['width'] = clusterSchema.clusterSize;
-      wrapperStyle['left'] = -clusterSchema.staticOffsetSize;
+    if (this.props.orientation === 'Horizontal') {
+      contentSize = this.props.contentSize;
+      size = this.props.height;
+      Container = HorizontalRuler;
+      style = { marginLeft: this.props.offset };
     } else {
-      clusterStyle['height'] = clusterSchema.clusterSize;
-      wrapperStyle['top'] = -clusterSchema.staticOffsetSize;
+      contentSize = this.props.height;
+      size = this.props.contentSize;
+      Container = VerticalRuler;
+      style = { marginTop: this.props.offset };
     }
 
-    const groups = [],
-      groupCluster = [];
+    const offset = (this.props.size - this.props.contentSize) / 2;
 
-    for (let i = 0; clusterSchema.clusterPerGroup > i; i++) {
-      groupCluster.push(<i key={i} style={clusterStyle} />);
-    }
-
-    for (let i = 0; clusterSchema.groups.length > i; i++) {
-      const groupName = ~~clusterSchema.groups[i];
-      groups.push(
-        <div key={groupName}>
-          <label>
-            <span>{groupName}</span>
-          </label>
-          {groupCluster}
-        </div>
-      );
-    }
-
-    return <div style={wrapperStyle}>{groups}</div>;
+    return (
+      <Container size={this.props.height} offset={this.props.offset - offset} style={style}>
+        <canvas ref={this.canvas} width={contentSize} height={size} />
+      </Container>
+    );
   }
 }
 
-interface IProps extends RulerProps {
-  viewportOffset: number;
-  size: number;
-}
+export default Ruler;
 
-const Wrapper = (props: IProps) => {
-  const createStyle = () => {
-    return props.position == 'top'
-      ? { width: props.containerSize, marginLeft: props.viewportOffset * -1 }
-      : { height: props.containerSize, marginTop: props.viewportOffset * -1 };
-  };
+const VerticalRuler = styled.div`
+  position: absolute;
+  top: ${(props: IProps) => props.offset - 1 + 'px'};
+  bottom: 0;
+  left: 0;
+  width: ${(props: IProps) => props.height + 'px'};
+  overflow: hidden;
+`;
 
-  const StyledRulerLine = props.position === 'top' ? TopRulerLine : LeftRulerLine;
-
-  return (
-    <StyledRulerLine size={props.size}>
-      <div className="inner" style={createStyle()}>
-        <Ruler {...props} />
-      </div>
-    </StyledRulerLine>
-  );
-};
-
-export default Wrapper;
+const HorizontalRuler = styled.div`
+  position: absolute;
+  left: ${(props: IProps) => props.offset - 1 + 'px'};
+  right: 0;
+  top: 0;
+  height: ${(props: IProps) => props.height + 'px'};
+  overflow: hidden;
+`;

@@ -1,13 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
 // // import { Link } from 'react-router';
 
 // // import { ApplicationState } from '../../contracts';
 // // import { actionCreators } from '../../actions/StudyMetadataFormEditor';
 // // import { StudyMetadataFormEditorState } from '../../contracts/StudyMetadataFormEditor';
 
-import Ruler from './Ruler1';
+import Ruler from './Ruler';
 import StatusPanel from './StatusPanel';
 
 // // type EditorProps = StudyMetadataFormEditorState & typeof actionCreators;
@@ -216,6 +215,8 @@ import StatusPanel from './StatusPanel';
 interface IProps {
   width?: number;
   height?: number;
+  contentWidth: number;
+  contentHeight: number;
 }
 
 interface IState {
@@ -229,13 +230,15 @@ interface IViewProps {
   offset: number;
 }
 
+const rulerSize = 20;
+
 export default class Layout extends React.Component<IProps, IState> {
   viewportEl: HTMLElement;
   state = {
     width: 0,
     height: 0,
     scrollLeft: 0,
-    scrollTop: 0
+    scrollTop: 0,
   };
 
   componentDidMount() {
@@ -265,20 +268,36 @@ export default class Layout extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { scrollTop, scrollLeft } = this.state;
+    const { scrollTop, scrollLeft, width, height } = this.state;
+    const { contentHeight, contentWidth } = this.props;
+
+    // console.log({ scrollTop, scrollLeft, width, height, contentHeight, contentWidth });
+
     return (
       <Frame {...this.props}>
-        <Ruler contentSize={1000} size={20} orientation="Horizontal" offset={scrollTop} />
-        <Ruler contentSize={1000} size={20} orientation="Vertical" offset={scrollLeft} />
+        <Ruler
+          contentSize={contentWidth}
+          size={width + contentWidth}
+          height={rulerSize}
+          orientation="Horizontal"
+          offset={scrollLeft}
+        />
+        <Ruler
+          contentSize={contentWidth}
+          size={height + contentHeight}
+          height={rulerSize}
+          orientation="Vertical"
+          offset={scrollTop}
+        />
         <Viewport
-          offset={20}
+          offset={rulerSize}
           innerRef={el => {
             this.viewportEl = el;
           }}
         >
           {this.props.children}
         </Viewport>
-        <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={1} zoomIn={null} zoomOut={null} size={20} />
+        <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={1} zoomIn={null} zoomOut={null} size={rulerSize} />
       </Frame>
     );
   }
