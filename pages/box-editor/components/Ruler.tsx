@@ -124,6 +124,8 @@ const renderRuler = (
   scale: number,
   adjustedOffset: number
 ) => {
+  console.log({ contentSize, adjustedOffset });
+
   const originalPixelsSize = contentSize / scale;
   let division = 1.0;
   let majorSkipPower = 0;
@@ -132,7 +134,9 @@ const renderRuler = (
   const subdivisions = null;
   const offsetPixels = adjustedOffset * scale;
   let start = -adjustedOffset / dpu - 1;
-  let end = (originalPixelsSize - adjustedOffset) / dpu + 1;
+  let end = (originalPixelsSize + adjustedOffset) / dpu + 1;
+
+
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
@@ -150,6 +154,8 @@ const renderRuler = (
   const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
   const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
   const divisionInPixels = majorDivisionPixels * division;
+
+  console.log({ start, end, division })
 
   while (index <= end) {
     const startDivPosition = index * majorDivisionPixels + offsetPixels;
@@ -171,18 +177,19 @@ class Ruler extends React.Component<IProps> {
 
   draw(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
+    const { contentSize, height, orientation, size } = this.props;
+    ctx.clearRect(0, 0, size, size);
+
     ctx.beginPath();
 
-    const { contentSize, height, orientation, size } = this.props;
-
-    renderRuler(ctx, size, height, orientation, 1, size - contentSize);
+    renderRuler(ctx, contentSize, height, orientation, 1, (size - contentSize)/2);
 
     if (orientation === 'Horizontal') {
       ctx.moveTo(0, height - halfTickThickness);
-      ctx.lineTo(contentSize, height - halfTickThickness);
+      ctx.lineTo(size, height - halfTickThickness);
     } else {
       ctx.moveTo(height - halfTickThickness, 0);
-      ctx.lineTo(height - halfTickThickness, contentSize);
+      ctx.lineTo(height - halfTickThickness, size);
     }
 
     ctx.stroke();
@@ -192,28 +199,37 @@ class Ruler extends React.Component<IProps> {
     this.draw(this.canvas.current);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {}
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.contentSize === prevProps.contentSize &&
+      this.props.height === prevProps.height &&
+      this.props.size === prevProps.size
+    ) {
+      return;
+    }
+
+    this.draw(this.canvas.current);
+  }
 
   render() {
     let contentSize, size, style, Container;
 
     if (this.props.orientation === 'Horizontal') {
-      contentSize = this.props.contentSize;
+      contentSize = this.props.size;
       size = this.props.height;
       Container = HorizontalRuler;
-      style = { marginLeft: this.props.offset };
+      style = { marginLeft: -this.props.offset };
     } else {
       contentSize = this.props.height;
-      size = this.props.contentSize;
+      size = this.props.size;
       Container = VerticalRuler;
-      style = { marginTop: this.props.offset };
+      style = { marginTop: -this.props.offset };
     }
 
-    const offset = (this.props.size - this.props.contentSize) / 2;
+    // const offset = (this.props.size - this.props.contentSize) / 2;
 
     return (
-      <Container size={this.props.height} offset={this.props.offset - offset} style={style}>
-        <canvas ref={this.canvas} width={contentSize} height={size} />
+      <Container height={this.props.height}>
+        <canvas ref={this.canvas} width={contentSize} height={size} style={style} />
       </Container>
     );
   }
@@ -223,7 +239,7 @@ export default Ruler;
 
 const VerticalRuler = styled.div`
   position: absolute;
-  top: ${(props: IProps) => props.offset - 1 + 'px'};
+  top: ${(props: IProps) => props.height - 1 + 'px'};
   bottom: 0;
   left: 0;
   width: ${(props: IProps) => props.height + 'px'};
@@ -232,7 +248,7 @@ const VerticalRuler = styled.div`
 
 const HorizontalRuler = styled.div`
   position: absolute;
-  left: ${(props: IProps) => props.offset - 1 + 'px'};
+  left: ${(props: IProps) => props.height - 1 + 'px'};
   right: 0;
   top: 0;
   height: ${(props: IProps) => props.height + 'px'};

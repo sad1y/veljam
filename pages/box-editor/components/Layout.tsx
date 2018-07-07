@@ -277,14 +277,14 @@ export default class Layout extends React.Component<IProps, IState> {
       <Frame {...this.props}>
         <Ruler
           contentSize={contentWidth}
-          size={width + contentWidth}
+          size={width*2 + contentWidth}
           height={rulerSize}
           orientation="Horizontal"
           offset={scrollLeft}
         />
         <Ruler
-          contentSize={contentWidth}
-          size={height + contentHeight}
+          contentSize={contentHeight}
+          size={height*2 + contentHeight}
           height={rulerSize}
           orientation="Vertical"
           offset={scrollTop}
@@ -295,13 +295,20 @@ export default class Layout extends React.Component<IProps, IState> {
             this.viewportEl = el;
           }}
         >
-          {this.props.children}
+          <Space margins={[height, width]}>
+            {this.props.children}
+          </Space>
         </Viewport>
         <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={1} zoomIn={null} zoomOut={null} size={rulerSize} />
       </Frame>
     );
   }
 }
+
+const Space = styled.div`
+  margin : ${(props: { margins: number[] }) => (props.margins[0] || 0) + 'px ' + (props.margins[1] || 0) + 'px'};
+  display: inline-block;
+`;
 
 const Frame = styled.div`
   position: relative;
@@ -315,6 +322,7 @@ const Viewport = styled.div`
   overflow: auto;
   overflow-y: scroll;
   overflow-x: scroll;
+  
   top: ${(props: IViewProps) => props.offset}px;
   bottom: ${(props: IViewProps) => props.offset}px;
   left: ${(props: IViewProps) => props.offset}px;
