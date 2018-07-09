@@ -137,6 +137,8 @@ const renderRuler = (
   let start = -adjustedOffset / dpu - 1;
   let end = (originalPixelsSize + adjustedOffset) / dpu + 1;
 
+  console.log({ scale, dpu, originalPixelsSize, offsetPixels, adjustedOffset, start, end });
+
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
     ++majorSkipPower;
@@ -213,16 +215,18 @@ class Ruler extends React.Component<IProps> {
     let contentSize, size, style, Container;
 
     if (this.props.orientation === 'Horizontal') {
-      contentSize = this.props.size;
+      contentSize = this.props.size * this.props.scale;
       size = this.props.height;
       Container = HorizontalRuler;
       style = { marginLeft: -this.props.offset };
     } else {
-      contentSize = this.props.height;
+      contentSize = this.props.height * this.props.scale;
       size = this.props.size;
       Container = VerticalRuler;
       style = { marginTop: -this.props.offset };
     }
+
+    console.log({ contentSize: this.props.contentSize, size: this.props.size, orientation: this.props.orientation });
 
     return (
       <Container height={this.props.height}>
