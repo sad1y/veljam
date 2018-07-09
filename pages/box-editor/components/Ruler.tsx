@@ -105,6 +105,7 @@ const subdivideY = (
 };
 
 const deg270 = Math.PI + Math.PI / 2;
+
 const renderVerticalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) => {
   ctx.save();
   ctx.translate(textSize / 2 + 1, 0);
@@ -113,6 +114,7 @@ const renderVerticalText = (ctx: CanvasRenderingContext2D, text: string, offset:
   ctx.fillText(text, -(offset + 2), 4);
   ctx.restore();
 };
+
 const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) =>
   ctx.fillText(text, offset + 2, 10);
 
@@ -124,8 +126,6 @@ const renderRuler = (
   scale: number,
   adjustedOffset: number
 ) => {
-  console.log({ contentSize, adjustedOffset });
-
   const originalPixelsSize = contentSize / scale;
   let division = 1.0;
   let majorSkipPower = 0;
@@ -135,8 +135,6 @@ const renderRuler = (
   const offsetPixels = adjustedOffset * scale;
   let start = -adjustedOffset / dpu - 1;
   let end = (originalPixelsSize + adjustedOffset) / dpu + 1;
-
-
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
@@ -154,8 +152,6 @@ const renderRuler = (
   const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
   const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
   const divisionInPixels = majorDivisionPixels * division;
-
-  console.log({ start, end, division })
 
   while (index <= end) {
     const startDivPosition = index * majorDivisionPixels + offsetPixels;
@@ -182,7 +178,7 @@ class Ruler extends React.Component<IProps> {
 
     ctx.beginPath();
 
-    renderRuler(ctx, contentSize, height, orientation, 1, (size - contentSize)/2);
+    renderRuler(ctx, contentSize, height, orientation, 1, (size - contentSize) / 2);
 
     if (orientation === 'Horizontal') {
       ctx.moveTo(0, height - halfTickThickness);
@@ -200,7 +196,8 @@ class Ruler extends React.Component<IProps> {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.contentSize === prevProps.contentSize &&
+    if (
+      this.props.contentSize === prevProps.contentSize &&
       this.props.height === prevProps.height &&
       this.props.size === prevProps.size
     ) {
@@ -224,8 +221,6 @@ class Ruler extends React.Component<IProps> {
       Container = VerticalRuler;
       style = { marginTop: -this.props.offset };
     }
-
-    // const offset = (this.props.size - this.props.contentSize) / 2;
 
     return (
       <Container height={this.props.height}>

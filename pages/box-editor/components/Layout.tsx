@@ -224,6 +224,7 @@ interface IState {
   height: number;
   scrollLeft: number;
   scrollTop: number;
+  scale: number;
 }
 
 interface IViewProps {
@@ -239,6 +240,7 @@ export default class Layout extends React.Component<IProps, IState> {
     height: 0,
     scrollLeft: 0,
     scrollTop: 0,
+    scale: 1
   };
 
   componentDidMount() {
@@ -267,24 +269,70 @@ export default class Layout extends React.Component<IProps, IState> {
     this.setState(() => ({ scrollLeft, scrollTop }));
   };
 
-  render() {
-    const { scrollTop, scrollLeft, width, height } = this.state;
-    const { contentHeight, contentWidth } = this.props;
+  getAdjustedScale = (scale: number, delta: number) => {
+    const nextScale = scale * delta;
+    const nextRouned = ~~nextScale;
+    const currentRounded = ~~scale;
+    const gap = Math.abs(nextRouned - currentRounded);
 
-    // console.log({ scrollTop, scrollLeft, width, height, contentHeight, contentWidth });
+    // if zoom out
+    if (delta < 1) {
+      // check that next threshold is almost reached
+      if (gap === 0 && nextScale - 0.05 <= currentRounded) {
+        return currentRounded - 1 > 0.2 ? currentRounded : 0.2;
+      }
+      // if we step over threshold and change is not too big
+      if (gap === 1) {
+        return scale - currentRounded >= currentRounded - nextScale ? currentRounded : nextScale;
+      }
+    }
+    // if zoom in
+    else {
+      // check that next threshold is almost reached
+      if (gap === 0 && nextScale + 0.05 >= currentRounded + 1) {
+        return currentRounded + 1;
+      }
+
+      // if we step over threshold and change is not too big
+      if (gap === 1) {
+        return nextRouned - scale >= nextScale - nextRouned ? nextRouned : nextScale;
+        
+      }
+    }
+
+    const newScale = nextRouned === currentRounded ? nextScale : nextRouned;
+
+    return newScale < 0.2 ? 0.2 : newScale;
+  };
+
+  zoomIn = (event, delta: number = 1.12) => {
+    this.setState(state => ({
+      scale: this.getAdjustedScale(state.scale, delta)
+    }));
+  };
+
+  zoomOut = (event, delta: number = 0.89) => {
+    this.setState(state => ({
+      scale: this.getAdjustedScale(state.scale, delta)
+    }));
+  };
+
+  render() {
+    const { scrollTop, scrollLeft, width, height, scale } = this.state;
+    const { contentHeight, contentWidth } = this.props;
 
     return (
       <Frame {...this.props}>
         <Ruler
           contentSize={contentWidth}
-          size={width*2 + contentWidth}
+          size={width * 2 + contentWidth}
           height={rulerSize}
           orientation="Horizontal"
           offset={scrollLeft}
         />
         <Ruler
           contentSize={contentHeight}
-          size={height*2 + contentHeight}
+          size={height * 2 + contentHeight}
           height={rulerSize}
           orientation="Vertical"
           offset={scrollTop}
@@ -295,18 +343,16 @@ export default class Layout extends React.Component<IProps, IState> {
             this.viewportEl = el;
           }}
         >
-          <Space margins={[height, width]}>
-            {this.props.children}
-          </Space>
+          <Space margins={[height, width]}>{this.props.children}</Space>
         </Viewport>
-        <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={1} zoomIn={null} zoomOut={null} size={rulerSize} />
+        <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={scale} zoomIn={this.zoomIn} zoomOut={this.zoomOut} size={rulerSize} />
       </Frame>
     );
   }
 }
 
 const Space = styled.div`
-  margin : ${(props: { margins: number[] }) => (props.margins[0] || 0) + 'px ' + (props.margins[1] || 0) + 'px'};
+  margin: ${(props: { margins: number[] }) => (props.margins[0] || 0) + 'px ' + (props.margins[1] || 0) + 'px'};
   display: inline-block;
 `;
 
@@ -322,7 +368,7 @@ const Viewport = styled.div`
   overflow: auto;
   overflow-y: scroll;
   overflow-x: scroll;
-  
+
   top: ${(props: IViewProps) => props.offset}px;
   bottom: ${(props: IViewProps) => props.offset}px;
   left: ${(props: IViewProps) => props.offset}px;
