@@ -296,7 +296,6 @@ export default class Layout extends React.Component<IProps, IState> {
       // if we step over threshold and change is not too big
       if (gap === 1) {
         return nextRouned - scale >= nextScale - nextRouned ? nextRouned : nextScale;
-        
       }
     }
 
@@ -305,13 +304,13 @@ export default class Layout extends React.Component<IProps, IState> {
     return newScale < 0.2 ? 0.2 : newScale;
   };
 
-  zoomIn = (event, delta: number = 1.12) => {
+  zoomIn = (_event, delta: number = 1.12) => {
     this.setState(state => ({
       scale: this.getAdjustedScale(state.scale, delta)
     }));
   };
 
-  zoomOut = (event, delta: number = 0.89) => {
+  zoomOut = (_event, delta: number = 0.89) => {
     this.setState(state => ({
       scale: this.getAdjustedScale(state.scale, delta)
     }));
@@ -329,6 +328,7 @@ export default class Layout extends React.Component<IProps, IState> {
           height={rulerSize}
           orientation="Horizontal"
           offset={scrollLeft}
+          scale={scale}
         />
         <Ruler
           contentSize={contentHeight}
@@ -336,24 +336,39 @@ export default class Layout extends React.Component<IProps, IState> {
           height={rulerSize}
           orientation="Vertical"
           offset={scrollTop}
+          scale={scale}
         />
-        <Viewport
+        <ScrollContainer
           offset={rulerSize}
           innerRef={el => {
             this.viewportEl = el;
           }}
         >
-          <Space margins={[height, width]}>{this.props.children}</Space>
-        </Viewport>
+          <Viewport margins={[height, width]} height={contentHeight} width={contentWidth} scale={scale}>
+            {this.props.children}
+          </Viewport>
+        </ScrollContainer>
         <StatusPanel mousePosition={{ x: 1, y: 1 }} scale={scale} zoomIn={this.zoomIn} zoomOut={this.zoomOut} size={rulerSize} />
       </Frame>
     );
   }
 }
 
-const Space = styled.div`
+const Viewport = styled.div`
   margin: ${(props: { margins: number[] }) => (props.margins[0] || 0) + 'px ' + (props.margins[1] || 0) + 'px'};
+  width: ${(props: any) => props.width * props.scale}px;
+  height: ${(props: any) => props.height * props.scale}px;
   display: inline-block;
+  position: relative;
+  background-color: yellow;
+
+  > * {
+    transform: translate(
+        ${props => (props.width * (props.scale - 1)) / 2}px,
+        ${props => (props.height * (props.scale - 1)) / 2}px
+      )
+      scale(${props => props.scale});
+  }
 `;
 
 const Frame = styled.div`
@@ -362,7 +377,7 @@ const Frame = styled.div`
   height: ${(props: IProps) => (props.height ? props.height + 'px' : '100%')};
 `;
 
-const Viewport = styled.div`
+const ScrollContainer = styled.div`
   position: absolute;
   background-color: red;
   overflow: auto;

@@ -8,6 +8,7 @@ interface IProps {
   height: number;
   orientation: Orientation;
   offset: number;
+  scale: number;
 }
 
 const tickHeights = [1.0, 0.6, 0.35, 0.25, 0.1, 0.075];
@@ -173,12 +174,12 @@ class Ruler extends React.Component<IProps> {
 
   draw(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
-    const { contentSize, height, orientation, size } = this.props;
+    const { contentSize, height, orientation, scale, size } = this.props;
     ctx.clearRect(0, 0, size, size);
 
     ctx.beginPath();
 
-    renderRuler(ctx, contentSize, height, orientation, 1, (size - contentSize) / 2);
+    renderRuler(ctx, contentSize, height, orientation, scale, (size - contentSize) / 2);
 
     if (orientation === 'Horizontal') {
       ctx.moveTo(0, height - halfTickThickness);
@@ -199,7 +200,8 @@ class Ruler extends React.Component<IProps> {
     if (
       this.props.contentSize === prevProps.contentSize &&
       this.props.height === prevProps.height &&
-      this.props.size === prevProps.size
+      this.props.size === prevProps.size &&
+      this.props.scale === prevProps.scale
     ) {
       return;
     }

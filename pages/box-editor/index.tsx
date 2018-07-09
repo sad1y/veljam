@@ -10,7 +10,7 @@ class BoxEditorPage extends React.Component<Props> {
   render() {
     return (
       <Layout height={500} width={500} contentHeight={930} contentWidth={780}>
-        <div style={{ width: 780, height: 930, backgroundColor: 'yellow' }} />
+        <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }} />
       </Layout>
     );
   }
