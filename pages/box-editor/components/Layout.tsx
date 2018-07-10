@@ -324,18 +324,18 @@ export default class Layout extends React.Component<IProps, IState> {
       <Frame {...this.props}>
         <Ruler
           contentSize={contentWidth}
-          size={width * 2 + contentWidth}
+          offsetSize={width}
           height={rulerSize}
           orientation="Horizontal"
-          offset={scrollLeft}
+          scrollPosition={scrollLeft}
           scale={scale}
         />
         <Ruler
           contentSize={contentHeight}
-          size={height * 2 + contentHeight}
+          offsetSize={height}
           height={rulerSize}
           orientation="Vertical"
-          offset={scrollTop}
+          scrollPosition={scrollTop}
           scale={scale}
         />
         <ScrollContainer

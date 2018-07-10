@@ -3,11 +3,11 @@ import styled from 'styled-components';
 
 type Orientation = 'Horizontal' | 'Vertical';
 interface IProps {
-  size: number;
+  offsetSize: number;
   contentSize: number;
   height: number;
   orientation: Orientation;
-  offset: number;
+  scrollPosition: number;
   scale: number;
 }
 
@@ -127,17 +127,16 @@ const renderRuler = (
   scale: number,
   offset: number
 ) => {
+  const dpu = 1;
+  const subdivisions = null;
   const originalPixelsSize = contentSize / scale;
   let division = 1.0;
   let majorSkipPower = 0;
-  const dpu = 1;
   let majorDivisionPixels = dpu * scale;
-  const subdivisions = null;
-  // const offsetPixels = offset / scale;
-  let start = -offset / dpu - 1;
-  let end = (originalPixelsSize + offset) / dpu + 1;
+  let start = (-offset * scale) / dpu - 1;
+  let end = (originalPixelsSize + offset * scale) / dpu + 1;
 
-  // console.log({ scale, dpu, originalPixelsSize, offsetPixels, offset, start, end });
+  console.log({ start, end });
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
@@ -176,19 +175,19 @@ class Ruler extends React.Component<IProps> {
 
   draw(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
-    const { contentSize, height, orientation, scale, size } = this.props;
-    ctx.clearRect(0, 0, size, size);
+    const { contentSize, height, orientation, scale, offsetSize } = this.props;
+    ctx.clearRect(0, 0, offsetSize, offsetSize);
 
     ctx.beginPath();
 
-    renderRuler(ctx, contentSize, height, orientation, scale, (size - contentSize) / 2);
+    renderRuler(ctx, contentSize, height, orientation, scale, offsetSize);
 
     if (orientation === 'Horizontal') {
       ctx.moveTo(0, height - halfTickThickness);
-      ctx.lineTo(size, height - halfTickThickness);
+      ctx.lineTo(offsetSize * 2 + contentSize * scale, height - halfTickThickness);
     } else {
       ctx.moveTo(height - halfTickThickness, 0);
-      ctx.lineTo(height - halfTickThickness, size);
+      ctx.lineTo(height - halfTickThickness, offsetSize * 2 + contentSize * scale);
     }
 
     ctx.stroke();
@@ -198,11 +197,11 @@ class Ruler extends React.Component<IProps> {
     this.draw(this.canvas.current);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: IProps, prevState, snapshot) {
     if (
       this.props.contentSize === prevProps.contentSize &&
       this.props.height === prevProps.height &&
-      this.props.size === prevProps.size &&
+      this.props.offsetSize === prevProps.offsetSize &&
       this.props.scale === prevProps.scale
     ) {
       return;
@@ -211,28 +210,30 @@ class Ruler extends React.Component<IProps> {
     this.draw(this.canvas.current);
   }
 
-  render() {
-    let contentSize, size, style, Container;
-
-    if (this.props.orientation === 'Horizontal') {
-      contentSize = this.props.size * this.props.scale;
-      size = this.props.height;
-      Container = HorizontalRuler;
-      style = { marginLeft: -this.props.offset };
-    } else {
-      contentSize = this.props.height * this.props.scale;
-      size = this.props.size;
-      Container = VerticalRuler;
-      style = { marginTop: -this.props.offset };
-    }
-
-    // console.log({ contentSize: this.props.contentSize, size: this.props.size, orientation: this.props.orientation });
+  renderVertical() {
+    const { contentSize, offsetSize, height, scale } = this.props;
+    const style = { marginTop: -this.props.scrollPosition + 'px' };
 
     return (
-      <Container height={this.props.height}>
-        <canvas ref={this.canvas} width={contentSize} height={size} style={style} />
-      </Container>
+      <VerticalRuler size={height}>
+        <canvas ref={this.canvas} width={height} height={offsetSize * 2 + contentSize * scale} style={style} />
+      </VerticalRuler>
     );
+  }
+
+  renderHorizontal() {
+    const { contentSize, offsetSize, height, scale } = this.props;
+    const style = { marginLeft: -this.props.scrollPosition + 'px' };
+
+    return (
+      <HorizontalRuler size={height}>
+        <canvas ref={this.canvas} width={offsetSize * 2 + contentSize * scale} height={height} style={style} />
+      </HorizontalRuler>
+    );
+  }
+
+  render() {
+    return this.props.orientation === 'Horizontal' ? this.renderHorizontal() : this.renderVertical();
   }
 }
 
@@ -240,18 +241,18 @@ export default Ruler;
 
 const VerticalRuler = styled.div`
   position: absolute;
-  top: ${(props: IProps) => props.height - 1 + 'px'};
+  top: ${(props: { size: number }) => props.size - 1 + 'px'};
   bottom: 0;
   left: 0;
-  width: ${(props: IProps) => props.height + 'px'};
+  width: ${(props: { size: number }) => props.size + 'px'};
   overflow: hidden;
 `;
 
 const HorizontalRuler = styled.div`
   position: absolute;
-  left: ${(props: IProps) => props.height - 1 + 'px'};
+  left: ${(props: { size: number }) => props.size - 1 + 'px'};
   right: 0;
   top: 0;
-  height: ${(props: IProps) => props.height + 'px'};
+  height: ${(props: { size: number }) => props.size + 'px'};
   overflow: hidden;
 `;
