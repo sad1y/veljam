@@ -125,7 +125,7 @@ const renderRuler = (
   size: number,
   orientation: Orientation,
   scale: number,
-  adjustedOffset: number
+  offset: number
 ) => {
   const originalPixelsSize = contentSize / scale;
   let division = 1.0;
@@ -133,11 +133,11 @@ const renderRuler = (
   const dpu = 1;
   let majorDivisionPixels = dpu * scale;
   const subdivisions = null;
-  const offsetPixels = adjustedOffset * scale;
-  let start = -adjustedOffset / dpu - 1;
-  let end = (originalPixelsSize + adjustedOffset) / dpu + 1;
+  // const offsetPixels = offset / scale;
+  let start = -offset / dpu - 1;
+  let end = (originalPixelsSize + offset) / dpu + 1;
 
-  console.log({ scale, dpu, originalPixelsSize, offsetPixels, adjustedOffset, start, end });
+  // console.log({ scale, dpu, originalPixelsSize, offsetPixels, offset, start, end });
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
@@ -157,7 +157,7 @@ const renderRuler = (
   const divisionInPixels = majorDivisionPixels * division;
 
   while (index <= end) {
-    const startDivPosition = index * majorDivisionPixels + offsetPixels;
+    const startDivPosition = index * majorDivisionPixels + offset;
 
     renderTicks(ctx, startDivPosition, size - 1, divisionInPixels, division, -majorSkipPower, size - 1, 0, subdivisions);
     renderLabels(ctx, index.toString(), startDivPosition, fontSize);
@@ -226,7 +226,7 @@ class Ruler extends React.Component<IProps> {
       style = { marginTop: -this.props.offset };
     }
 
-    console.log({ contentSize: this.props.contentSize, size: this.props.size, orientation: this.props.orientation });
+    // console.log({ contentSize: this.props.contentSize, size: this.props.size, orientation: this.props.orientation });
 
     return (
       <Container height={this.props.height}>
