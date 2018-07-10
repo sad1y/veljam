@@ -9,7 +9,7 @@ type Props = typeof actionCreators;
 class BoxEditorPage extends React.Component<Props> {
   render() {
     return (
-      <Layout height={500} width={500} contentHeight={930} contentWidth={780}>
+      <Layout height={1000} width={1000} contentHeight={930} contentWidth={780}>
         <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }} />
       </Layout>
     );

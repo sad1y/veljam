@@ -290,7 +290,7 @@ export default class Layout extends React.Component<IProps, IState> {
     else {
       // check that next threshold is almost reached
       if (gap === 0 && nextScale + 0.05 >= currentRounded + 1) {
-        return currentRounded + 1;
+        return currentRounded + 1 > 40 ? 40 : currentRounded + 1;
       }
 
       // if we step over threshold and change is not too big
@@ -324,7 +324,7 @@ export default class Layout extends React.Component<IProps, IState> {
       <Frame {...this.props}>
         <Ruler
           contentSize={contentWidth}
-          offsetSize={width}
+          offsetSize={width / 2}
           height={rulerSize}
           orientation="Horizontal"
           scrollPosition={scrollLeft}
@@ -332,7 +332,7 @@ export default class Layout extends React.Component<IProps, IState> {
         />
         <Ruler
           contentSize={contentHeight}
-          offsetSize={height}
+          offsetSize={height / 2}
           height={rulerSize}
           orientation="Vertical"
           scrollPosition={scrollTop}
@@ -344,7 +344,7 @@ export default class Layout extends React.Component<IProps, IState> {
             this.viewportEl = el;
           }}
         >
-          <Viewport margins={[height, width]} height={contentHeight} width={contentWidth} scale={scale}>
+          <Viewport margins={[height / 2, width / 2]} height={contentHeight} width={contentWidth} scale={scale}>
             {this.props.children}
           </Viewport>
         </ScrollContainer>
