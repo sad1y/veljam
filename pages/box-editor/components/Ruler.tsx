@@ -136,8 +136,6 @@ const renderRuler = (
   let start = (-offset * scale) / dpu - 1;
   let end = (originalPixelsSize + offset * scale) / dpu + 1;
 
-  console.log({ start, end });
-
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
     ++majorSkipPower;
