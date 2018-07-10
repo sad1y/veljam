@@ -116,8 +116,7 @@ const renderVerticalText = (ctx: CanvasRenderingContext2D, text: string, offset:
   ctx.restore();
 };
 
-const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offset: number, textSize: number) =>
-  ctx.fillText(text, offset + 2, 10);
+const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offset: number) => ctx.fillText(text, offset + 2, 10);
 
 const renderRuler = (
   ctx: CanvasRenderingContext2D,
@@ -129,7 +128,7 @@ const renderRuler = (
 ) => {
   const dpu = 1;
   const subdivisions = null;
-  const originalPixelsSize = contentSize / scale;
+  const originalPixelsSize = contentSize * scale;
   let division = 1.0;
   let majorSkipPower = 0;
   let majorDivisionPixels = dpu * scale;
@@ -140,6 +139,8 @@ const renderRuler = (
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
     ++majorSkipPower;
   }
+
+  console.log({ start, originalPixelsSize, end });
 
   start = division * Math.floor(start / division);
 
@@ -152,8 +153,6 @@ const renderRuler = (
   const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
   const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
   const divisionInPixels = majorDivisionPixels * division;
-
-  console.log({ index, offset, majorDivisionPixels });
 
   while (index <= end) {
     const startDivPosition = index * majorDivisionPixels + offset;
@@ -197,7 +196,7 @@ class Ruler extends React.Component<IProps> {
     this.draw(this.canvas.current);
   }
 
-  componentDidUpdate(prevProps: IProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: IProps) {
     if (
       this.props.contentSize === prevProps.contentSize &&
       this.props.height === prevProps.height &&
@@ -216,7 +215,7 @@ class Ruler extends React.Component<IProps> {
 
     return (
       <VerticalRuler size={height}>
-        <canvas ref={this.canvas} width={height} height={offsetSize * 2 + contentSize * scale} style={style} />
+        <canvas ref={this.canvas} width={height} height={(offsetSize) * 2 + contentSize * scale} style={style} />
       </VerticalRuler>
     );
   }
@@ -227,7 +226,7 @@ class Ruler extends React.Component<IProps> {
 
     return (
       <HorizontalRuler size={height}>
-        <canvas ref={this.canvas} width={offsetSize * 2 + contentSize * scale} height={height} style={style} />
+        <canvas ref={this.canvas} width={(offsetSize) * 2 + contentSize * scale} height={height} style={style} />
       </HorizontalRuler>
     );
   }
