@@ -279,7 +279,7 @@ export default class Layout extends React.Component<IProps, IState> {
     if (delta < 1) {
       // check that next threshold is almost reached
       if (gap === 0 && nextScale - 0.05 <= currentRounded) {
-        return currentRounded - 1 > 0.2 ? currentRounded : 0.2;
+        return currentRounded - 1;
       }
       // if we step over threshold and change is not too big
       if (gap === 1) {
@@ -290,7 +290,7 @@ export default class Layout extends React.Component<IProps, IState> {
     else {
       // check that next threshold is almost reached
       if (gap === 0 && nextScale + 0.05 >= currentRounded + 1) {
-        return currentRounded + 1 > 40 ? 40 : currentRounded + 1;
+        return currentRounded + 1;
       }
 
       // if we step over threshold and change is not too big
@@ -299,21 +299,21 @@ export default class Layout extends React.Component<IProps, IState> {
       }
     }
 
-    const newScale = nextRouned === currentRounded ? nextScale : nextRouned;
-
-    return newScale < 0.2 ? 0.2 : newScale;
+    return nextRouned === currentRounded ? nextScale : nextRouned;
   };
 
   zoomIn = (_event, delta: number = 1.12) => {
-    this.setState(state => ({
-      scale: this.getAdjustedScale(state.scale, delta)
-    }));
+    this.setState(state => {
+      const newScale = this.getAdjustedScale(state.scale, delta);
+      return { scale: newScale > 16 ? 16 : newScale };
+    });
   };
 
   zoomOut = (_event, delta: number = 0.89) => {
-    this.setState(state => ({
-      scale: this.getAdjustedScale(state.scale, delta)
-    }));
+    this.setState(state => {
+      const newScale = this.getAdjustedScale(state.scale, delta);
+      return { scale: newScale < 0.2 ? 0.2 : newScale };
+    });
   };
 
   render() {

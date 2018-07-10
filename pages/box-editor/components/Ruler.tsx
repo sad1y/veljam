@@ -133,8 +133,8 @@ const renderRuler = (
   let division = 1.0;
   let majorSkipPower = 0;
   let majorDivisionPixels = dpu * scale;
-  let start = (-offset * scale) / dpu - 1;
-  let end = (originalPixelsSize + offset * scale) / dpu + 1;
+  let start = -offset / scale / dpu - 1;
+  let end = (originalPixelsSize + offset / scale) / dpu + 1;
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
@@ -152,6 +152,8 @@ const renderRuler = (
   const renderTicks = orientation === 'Horizontal' ? subdivideX : subdivideY;
   const renderLabels = orientation === 'Horizontal' ? renderHorizontalText : renderVerticalText;
   const divisionInPixels = majorDivisionPixels * division;
+
+  console.log({ index, offset, majorDivisionPixels });
 
   while (index <= end) {
     const startDivPosition = index * majorDivisionPixels + offset;
