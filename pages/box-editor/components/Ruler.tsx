@@ -140,8 +140,6 @@ const renderRuler = (
     ++majorSkipPower;
   }
 
-  console.log({ start, originalPixelsSize, end });
-
   start = division * Math.floor(start / division);
 
   let index = start;
