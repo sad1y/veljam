@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../actions';
-import Layout from './components/Layout';
+import Layout from 'components/viewport';
 
 type Props = typeof actionCreators;
 

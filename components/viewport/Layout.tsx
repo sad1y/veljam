@@ -32,7 +32,7 @@ export default class Layout extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
 
-    this.mouseMoveHandler = throttle(this.mouseMoveHandler, 100).bind(this);
+    this.scrollHandler = throttle(this.scrollHandler, 100).bind(this);
   }
 
   scrollEl: HTMLElement;
@@ -59,7 +59,6 @@ export default class Layout extends React.Component<IProps, IState> {
     if (!div) return;
 
     div.addEventListener('scroll', this.scrollHandler);
-    //     div.addEventListener('mousemove', this.mouseMoveHandler);
 
     this.setState(() => ({
       height: div.clientHeight,
@@ -76,10 +75,9 @@ export default class Layout extends React.Component<IProps, IState> {
     if (!div) return;
 
     div.removeEventListener('scroll', this.scrollHandler);
-    //  div.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
-  scrollHandler = () => {
+  scrollHandler() {
     const scrollEl = this.scrollEl;
     if (!scrollEl) return;
 
@@ -91,8 +89,6 @@ export default class Layout extends React.Component<IProps, IState> {
 
     this.setState(() => ({ scrollLeft, scrollTop }));
   };
-
-  mouseMoveHandler = (event: MouseEvent) => {};
 
   getAdjustedScale = (scale: number, delta: number) => {
     const nextScale = scale * delta;
@@ -151,7 +147,7 @@ export default class Layout extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { scrollTop, scrollLeft, width, height, scale, offset } = this.state;
+    const { scrollTop, scrollLeft, scale, offset } = this.state;
     const { contentHeight, contentWidth } = this.props;
 
     return (
