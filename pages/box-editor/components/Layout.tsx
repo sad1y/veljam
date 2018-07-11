@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import Ruler from './Ruler';
 import StatusPanel from './StatusPanel';
+import CursorTracker from 'react-cursor-position';
 const throttle = require('lodash/throttle');
 
 interface IProps {
@@ -16,8 +17,8 @@ interface IState {
   height: number;
   scrollLeft: number;
   scrollTop: number;
-  mouseX: number;
-  mouseY: number;
+  mousePosition: IPosition;
+  offset: IPosition;
   scale: number;
 }
 
@@ -42,8 +43,14 @@ export default class Layout extends React.Component<IProps, IState> {
     height: 0,
     scrollLeft: 0,
     scrollTop: 0,
-    mouseX: 0,
-    mouseY: 0,
+    offset: {
+      x: 0,
+      y: 0
+    },
+    mousePosition: {
+      x: 0,
+      y: 0
+    },
     scale: 1
   };
 
@@ -52,11 +59,15 @@ export default class Layout extends React.Component<IProps, IState> {
     if (!div) return;
 
     div.addEventListener('scroll', this.scrollHandler);
-    div.addEventListener('mousemove', this.mouseMoveHandler);
+    //     div.addEventListener('mousemove', this.mouseMoveHandler);
 
     this.setState(() => ({
       height: div.clientHeight,
-      width: div.clientWidth
+      width: div.clientWidth,
+      offset: {
+        x: div.clientWidth / 2,
+        y: div.clientHeight / 2
+      }
     }));
   }
 
@@ -65,7 +76,7 @@ export default class Layout extends React.Component<IProps, IState> {
     if (!div) return;
 
     div.removeEventListener('scroll', this.scrollHandler);
-    div.removeEventListener('mousemove', this.mouseMoveHandler);
+    //  div.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
   scrollHandler = () => {
@@ -81,18 +92,7 @@ export default class Layout extends React.Component<IProps, IState> {
     this.setState(() => ({ scrollLeft, scrollTop }));
   };
 
-  mouseMoveHandler = (event: MouseEvent) => {
-    //event.persist();
-    // console.log({
-    //   mouseX: event.offsetX,
-    //   mouseY: event.offsetY
-    // });
-
-    this.setState(() => ({
-      mouseX: event.offsetX,
-      mouseY: event.offsetY
-    }));
-  };
+  mouseMoveHandler = (event: MouseEvent) => {};
 
   getAdjustedScale = (scale: number, delta: number) => {
     const nextScale = scale * delta;
@@ -141,15 +141,24 @@ export default class Layout extends React.Component<IProps, IState> {
     });
   };
 
+  updateMousePosition = (position: IPosition) => {
+    this.setState(state => ({
+      mousePosition: {
+        x: ~~(position.x + state.scrollLeft - rulerSize - state.offset.x) * state.scale,
+        y: ~~(position.y + state.scrollTop - rulerSize - state.offset.y) * state.scale
+      }
+    }));
+  };
+
   render() {
-    const { scrollTop, scrollLeft, width, height, scale } = this.state;
+    const { scrollTop, scrollLeft, width, height, scale, offset } = this.state;
     const { contentHeight, contentWidth } = this.props;
 
     return (
       <Frame {...this.props}>
         <Ruler
           contentSize={contentWidth}
-          offsetSize={width / 2}
+          offsetSize={offset.x}
           height={rulerSize}
           orientation="Horizontal"
           scrollPosition={scrollLeft}
@@ -157,32 +166,34 @@ export default class Layout extends React.Component<IProps, IState> {
         />
         <Ruler
           contentSize={contentHeight}
-          offsetSize={height / 2}
+          offsetSize={offset.y}
           height={rulerSize}
           orientation="Vertical"
           scrollPosition={scrollTop}
           scale={scale}
         />
-        <ScrollContainer
-          offset={rulerSize}
-          innerRef={el => {
-            this.scrollEl = el;
-          }}
-        >
-          <Viewport
-            margins={[height / 2, width / 2]}
-            height={contentHeight}
-            width={contentWidth}
-            scale={scale}
+        <CursorTracker shouldDecorateChildren={false} onPositionChanged={props => this.updateMousePosition(props.position)}>
+          <ScrollContainer
+            offset={rulerSize}
             innerRef={el => {
-              this.viewportEl = el;
+              this.scrollEl = el;
             }}
           >
-            {this.props.children}
-          </Viewport>
-        </ScrollContainer>
+            <Viewport
+              margins={[offset.y, offset.x]}
+              height={contentHeight}
+              width={contentWidth}
+              scale={scale}
+              innerRef={el => {
+                this.viewportEl = el;
+              }}
+            >
+              {this.props.children}
+            </Viewport>
+          </ScrollContainer>
+        </CursorTracker>
         <StatusPanel
-          mousePosition={{ x: this.state.mouseX, y: this.state.mouseY }}
+          mousePosition={this.state.mousePosition}
           scale={scale}
           zoomIn={this.zoomIn}
           zoomOut={this.zoomOut}
