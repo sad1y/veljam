@@ -32,7 +32,7 @@ export default class Layout extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
 
-    this.scrollHandler = throttle(this.scrollHandler, 100).bind(this);
+    this.scrollHandler = this.scrollHandler.bind(this);
   }
 
   scrollEl: HTMLElement;

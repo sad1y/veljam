@@ -5,31 +5,29 @@ import 'isomorphic-unfetch';
 
 es6promise.polyfill();
 
-const startClockActoinType: Actions.ActionType<Actions.Tests.IStartClock> = 'StartClock';
-const loadDataType: Actions.ActionType<Actions.Tests.ILoadData> = 'LoadData';
 
-function* runClockSaga() {
-    yield take(startClockActoinType);
-    while (true) {
-        yield put<Actions.Tests.ITickClock>({ type: 'TickClock', light: false, ts: Date.now() });
-        yield call(delay, 1000);
-    }
-}
+// function* runClockSaga() {
+//     yield take(startClockActoinType);
+//     while (true) {
+//         yield put<Actions.Tests.ITickClock>({ type: 'TickClock', light: false, ts: Date.now() });
+//         yield call(delay, 1000);
+//     }
+// }
 
-function* loadDataSaga() {
-    try {
-        const res = yield fetch('https://jsonplaceholder.typicode.com/users');
-        const data = yield res.json();
-        yield put<Actions.Tests.ILoadDataSuccess>({ type: 'LoadDataSuccess', data });
-    } catch (error) {
-        yield put<Actions.Tests.IFailure>({ type: 'Failure', error });
-    }
-}
+// function* loadDataSaga() {
+//     try {
+//         const res = yield fetch('https://jsonplaceholder.typicode.com/users');
+//         const data = yield res.json();
+//         yield put<Actions.Tests.ILoadDataSuccess>({ type: 'LoadDataSuccess', data });
+//     } catch (error) {
+//         yield put<Actions.Tests.IFailure>({ type: 'Failure', error });
+//     }
+// }
 
 function* rootSaga() {
     yield all([
-        call(runClockSaga), 
-        takeLatest(loadDataType, loadDataSaga)
+        // call(runClockSaga), 
+        // takeLatest(loadDataType, loadDataSaga)
     ]);
 }
 

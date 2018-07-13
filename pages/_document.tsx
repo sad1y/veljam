@@ -37,4 +37,9 @@ const Body = styled.body`
   padding: 0;
   height: 100%;
   width: 100%;
+
+  #__next {
+    height: 100%;
+    width: 100%;
+  }
 `;

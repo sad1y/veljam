@@ -8,7 +8,6 @@ import createStore from '../store';
 
 class Veljam extends App {
   static async getInitialProps({ Component, ctx }) {
-    console.log('Veljam::getInitialProps');
     let pageProps = {};
 
     if (Component.getInitialProps) {
@@ -19,8 +18,6 @@ class Veljam extends App {
   }
 
   render() {
-    console.log('Veljam::render');
-
     const { props } = this as any;
     const { Component, pageProps, store } = props;
 

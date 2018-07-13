@@ -14,8 +14,8 @@ interface IStatusPanelProps {
 
 const StatusPanel = (props: IStatusPanelProps) => {
   const { mousePosition } = props,
-    mouseX = mousePosition ? mousePosition.x : 0,
-    mouseY = mousePosition ? mousePosition.y : 0;
+    mouseX = mousePosition ? ~~mousePosition.x : 0,
+    mouseY = mousePosition ? ~~mousePosition.y : 0;
 
   const scale = ~~((props.scale || 1) * 100);
 

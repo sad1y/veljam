@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import testing, { testingInitState } from '../pages/box-editor/reducers';
+import boxEditor, { boxEditorInitState } from '../pages/box-editor/reducers';
 
 export const rootState: State.IRoot = {
-  testing: testingInitState
+  boxEditor: boxEditorInitState
 };
 
-export default combineReducers({ testing });
+export default combineReducers({ boxEditor });
