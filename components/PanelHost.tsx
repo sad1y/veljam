@@ -1,18 +1,34 @@
 import * as React from 'react';
 import { DropTarget, DropTargetConnector, DropTargetMonitor, ConnectDropTarget, XYCoord } from 'react-dnd';
 
-import { FloatingPanelType } from './Panel';
+import Panel, { FloatingPanelType } from './Panel';
+
+interface IPanel {
+  header: React.Component;
+  body: React.Component;
+  initPosition?: IPosition;
+  canMove?: boolean;
+}
+
+interface IUniquePanel extends IPanel {
+  id: number;
+  position: IPosition;
+}
 
 interface IProps extends React.Props<any> {
   canDrop?: boolean;
   isOver?: boolean;
   connectDropTarget?: ConnectDropTarget;
   onPositionChanged: (id: number, delta: IPosition) => any;
+  panels: IPanel[];
 }
 
+interface IState {
+  panels: IUniquePanel[];
+}
 
 const boxTarget = {
-  drop(props, monitor: DropTargetMonitor, component) {
+  drop(props, monitor: DropTargetMonitor, component: PanelHost) {
     if (!component) {
       return;
     }
@@ -23,30 +39,65 @@ const boxTarget = {
 
     // component.moveBox(item.id, left, top);
 
-	console.log(props, item.id, delta);
-	
-	return delta;
+    component.movePanelHandler(item.id, delta);
+
+    return delta;
   }
 };
 
-const style: React.CSSProperties = {
+const inactiveStyle: React.CSSProperties = {
   height: '100%',
-  width: '100%'
+  width: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  top: 0,
+  left: 0
 };
 
-class PanelHost extends React.Component<IProps> {
-  render() {
-    const { canDrop, isOver, connectDropTarget } = this.props;
-    const isActive = canDrop && isOver;
+const activeStyle: React.CSSProperties = {
+  ...inactiveStyle,
+  pointerEvents: 'auto'
+};
 
-    let backgroundColor = '#222';
-    if (isActive) {
-      backgroundColor = 'darkgreen';
-    } else if (canDrop) {
-      backgroundColor = 'darkkhaki';
+class PanelHost extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+
+    if (!props.panels || !props.panels.length) throw new Error('panels cant be empty or null');
+
+    this.state = {
+      panels: props.panels.map((f, index) => ({ ...f, id: index + 1, position: f.initPosition }))
+    };
+  }
+
+  movePanelHandler = (id: number, delta: IPosition) => {
+    const panels = this.state.panels;
+    const index = panels.findIndex(f => f.id === id);
+
+    if (index < 0) {
+      return;
     }
 
-    return connectDropTarget && connectDropTarget(<div style={{ ...style, backgroundColor }}>{this.props.children}</div>);
+    const panel = panels[index];
+    const updatedPanel = { ...panel, position: { x: panel.position.x + delta.x, y: panel.position.y + delta.y } };
+    const newPanels = [...panels.slice(0, index), updatedPanel, ...panels.slice(index + 1)];
+
+    this.setState(() => ({
+      panels: newPanels
+    }));
+  };
+
+  render() {
+    const { canDrop, isOver, connectDropTarget } = this.props;
+    const backgroundColor = canDrop ? 'rgba(52, 52, 52, 0.8)' : 'inherit';
+    const style = isOver ? activeStyle : inactiveStyle;
+
+    return (
+      connectDropTarget &&
+      connectDropTarget(
+        <div style={{ ...style, backgroundColor }}>{this.state.panels.map(f => <Panel key={f.id} {...f} />)}</div>
+      )
+    );
   }
 }
 

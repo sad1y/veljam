@@ -5,22 +5,18 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import Viewport from 'components/viewport';
 import PanelLayer from './PanelLayer';
 
-const panels = [
-  {
-    title: 'Компоненты',
-    content: 'none',
-    position: { x: 100, y: 400 }
-  }
-];
-
 class Layout extends React.Component {
   render() {
     return (
       <Container>
         <DragDropContextProvider backend={HTML5Backend}>
-          {/* <Viewport contentWidth={780} contentHeight={930}>
+          <Viewport contentWidth={780} contentHeight={930}>
             <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }} />
-          </Viewport> */}
+          </Viewport>
+
+          {/* <div style={{ position: 'absolute', width: 500, height: 500, overflow: 'auto' }}>
+            <div style={{ width: 780, height: 930, border: 'yellow solid 3px', boxSizing: 'border-box' }} />
+          </div> */}
           <PanelLayer />
         </DragDropContextProvider>
       </Container>
