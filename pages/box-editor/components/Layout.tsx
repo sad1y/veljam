@@ -11,7 +11,9 @@ class Layout extends React.Component {
       <Container>
         <DragDropContextProvider backend={HTML5Backend}>
           <Viewport contentWidth={780} contentHeight={930}>
-            <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }} />
+            <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }}>
+              <InnerComponent />
+            </div>
           </Viewport>
 
           {/* <div style={{ position: 'absolute', width: 500, height: 500, overflow: 'auto' }}>
@@ -25,6 +27,10 @@ class Layout extends React.Component {
 }
 
 export default Layout;
+
+const InnerComponent = () => {
+  return <span>test</span>;
+};
 
 const Container = styled.div`
   position: relative;

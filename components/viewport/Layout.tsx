@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Ruler from './Ruler';
 import StatusPanel from './StatusPanel';
 import CursorTracker from 'react-cursor-position';
-const throttle = require('lodash/throttle');
 
 interface IProps {
   width?: number;
@@ -140,8 +139,8 @@ export default class Layout extends React.Component<IProps, IState> {
   updateMousePosition = (position: IPosition) => {
     this.setState(state => ({
       mousePosition: {
-        x: ~~(position.x + state.scrollLeft - rulerSize - state.offset.x) * state.scale,
-        y: ~~(position.y + state.scrollTop - rulerSize - state.offset.y) * state.scale
+        x: ~~(position.x + state.scrollLeft - rulerSize - state.offset.x) / state.scale,
+        y: ~~(position.y + state.scrollTop - rulerSize - state.offset.y) / state.scale
       }
     }));
   };
