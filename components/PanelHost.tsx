@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DropTarget, DropTargetConnector, DropTargetMonitor, ConnectDropTarget, XYCoord } from 'react-dnd';
+import { DropTarget, DropTargetConnector, DropTargetMonitor, ConnectDropTarget } from 'react-dnd';
 
 import Panel, { FloatingPanelType } from './Panel';
 
@@ -28,16 +28,12 @@ interface IState {
 }
 
 const boxTarget = {
-  drop(props, monitor: DropTargetMonitor, component: PanelHost) {
+  drop(_props, monitor: DropTargetMonitor, component: PanelHost) {
     if (!component) {
       return;
     }
     const item = monitor.getItem();
-    const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-    // const left = Math.round(item.left + delta.x);
-    // const top = Math.round(item.top + delta.y);
-
-    // component.moveBox(item.id, left, top);
+    const delta = monitor.getDifferenceFromInitialOffset();
 
     component.movePanelHandler(item.id, delta);
 
