@@ -2,10 +2,9 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import actionCreators from '../actionsCreator';
 import PanelsHost from 'components/PanelHost';
-import ToolPanel from './ToolPanel';
+import ControlsPanel from './ControlsPanel';
 
 interface IProps {
-  panels: State.IBoxEditor['panels'];
   onPositionChanged: (id: number, delta: IPosition) => any;
 }
 
@@ -14,8 +13,8 @@ const PanelLayer = (props: IProps) => {
     <PanelsHost
       panels={[
         {
-          header: <div>tools</div>,
-          body: <ToolPanel />,
+          header: 'controls',
+          body: <ControlsPanel />,
           canMove: true,
           initPosition: { x: 100, y: 140 }
         },

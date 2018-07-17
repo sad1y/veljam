@@ -15,10 +15,6 @@ class Layout extends React.Component {
               <InnerComponent />
             </div>
           </Viewport>
-
-          {/* <div style={{ position: 'absolute', width: 500, height: 500, overflow: 'auto' }}>
-            <div style={{ width: 780, height: 930, border: 'yellow solid 3px', boxSizing: 'border-box' }} />
-          </div> */}
           <PanelLayer />
         </DragDropContextProvider>
       </Container>

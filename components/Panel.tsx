@@ -29,10 +29,11 @@ const collect = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
   };
 };
 
-const headerStyle = {
+const headerStyle: React.CSSProperties = {
   margin: '-10px -10px 0 -10px',
   padding: '10px',
-  cursor: 'move'
+  cursor: 'move',
+  backgroundColor: '#bbb'
 };
 
 class Panel extends React.Component<IProps> {
@@ -57,7 +58,7 @@ class Panel extends React.Component<IProps> {
 }
 
 const Layout = styled.div`
-  border: 1px solid #444;
+  box-shadow: 1px 2px 10px 4px rgba(0, 0, 0, 0.3);
   padding: 10px;
   background-color: #fff;
   pointer-events: auto;

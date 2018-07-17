@@ -87,7 +87,7 @@ export default class Layout extends React.Component<IProps, IState> {
     }
 
     this.setState(() => ({ scrollLeft, scrollTop }));
-  };
+  }
 
   getAdjustedScale = (scale: number, delta: number) => {
     const nextScale = scale * delta;
@@ -139,8 +139,8 @@ export default class Layout extends React.Component<IProps, IState> {
   updateMousePosition = (position: IPosition) => {
     this.setState(state => ({
       mousePosition: {
-        x: ~~(position.x + state.scrollLeft - rulerSize - state.offset.x) / state.scale,
-        y: ~~(position.y + state.scrollTop - rulerSize - state.offset.y) / state.scale
+        x: Math.round((position.x + state.scrollLeft - rulerSize - state.offset.x) / state.scale),
+        y: Math.round((position.y + state.scrollTop - rulerSize - state.offset.y) / state.scale)
       }
     }));
   };
@@ -205,7 +205,7 @@ const Viewport = styled.div`
   height: ${(props: any) => props.height * props.scale}px;
   display: inline-block;
   position: relative;
-  background-color: yellow;
+  background-color: #fff;
 
   > * {
     transform: translate(
@@ -224,7 +224,7 @@ const Frame = styled.div`
 
 const ScrollContainer = styled.div`
   position: absolute;
-  background-color: red;
+  background-color: #e5e5e5;
   overflow: auto;
   overflow-y: scroll;
   overflow-x: scroll;
