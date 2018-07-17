@@ -4,6 +4,7 @@ import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import Viewport from 'components/viewport';
 import PanelLayer from './PanelLayer';
+import Area from './Area';
 
 class Layout extends React.Component {
   render() {
@@ -11,9 +12,9 @@ class Layout extends React.Component {
       <Container>
         <DragDropContextProvider backend={HTML5Backend}>
           <Viewport contentWidth={780} contentHeight={930}>
-            <div style={{ width: 780, height: 930, border: 'green solid 3px', boxSizing: 'border-box' }}>
+            <Area width={780} height={930} onDrop={null}>
               <InnerComponent />
-            </div>
+            </Area>
           </Viewport>
           <PanelLayer />
         </DragDropContextProvider>

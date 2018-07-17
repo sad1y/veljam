@@ -58,7 +58,7 @@ class Panel extends React.Component<IProps> {
 }
 
 const Layout = styled.div`
-  box-shadow: 1px 2px 10px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 2px 10px 4px rgba(0, 0, 0, 0.1);
   padding: 10px;
   background-color: #fff;
   pointer-events: auto;

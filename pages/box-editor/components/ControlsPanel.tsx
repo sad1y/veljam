@@ -1,17 +1,18 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Prototype from './Control';
+import Control from './Control';
 import Box from 'components/icons/Box';
+import constants from '../constants';
 
 export default () => {
   return (
-    <PrototypeList>
-      <Prototype icon={<Box size={30} />} type="NEW_BOX" name="box" />
-    </PrototypeList>
+    <ControlList>
+      <Control icon={<Box size={30} />} type={constants.NEW_BOX} name="box" />
+    </ControlList>
   );
 };
 
-const PrototypeList = styled.div`
+const ControlList = styled.div`
   span {
     font-size: 10px;
   }
