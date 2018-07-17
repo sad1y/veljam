@@ -139,7 +139,7 @@ export default class Layout extends React.Component<IProps, IState> {
   updateMousePosition = (position: IPosition) => {
     this.setState(state => ({
       mousePosition: {
-        x: ~~(position.x + state.scrollLeft - rulerSize - state.offset.x) / state.scale,
+        x: ~~(position.x + state.scrollLeft - rulerSize - state.Уoffset.x) / state.scale,
         y: ~~(position.y + state.scrollTop - rulerSize - state.offset.y) / state.scale
       }
     }));
