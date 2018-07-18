@@ -5,6 +5,7 @@ import { DropTarget, ConnectDropTarget, DropTargetMonitor } from 'react-dnd';
 import { IViewportState } from 'components/viewport';
 import { dropTypes } from '../constants';
 import actionsCreator from '../actionsCreator';
+import AreaObject from './AreaObject';
 
 interface IOwnProps {
   width: number;
@@ -16,11 +17,11 @@ interface IOwnProps {
   getViewportContext: () => IViewportState;
 }
 
-type Props = IOwnProps;
+type Props = IOwnProps & State.IBoxEditor & typeof actionsCreator;
 
 const target = {
   drop(props: Props, monitor: DropTargetMonitor, component) {
-    const result = monitor.getDropResult();
+    const result = monitor.getItem();
 
     if (!result) return;
 
@@ -28,12 +29,13 @@ const target = {
       const clientOffset = monitor.getClientOffset();
       const areaBounds = (findDOMNode(component) as Element).getBoundingClientRect();
       const viewport = props.getViewportContext();
-      const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale);
-      const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale);
+      const size = result.size as ISize;
+      const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale) - size.width / 2;
+      const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale) - size.height / 2;
 
-      //   if (props.createObject) {
-      //     props.createObject(result.type, result.size, { x, y });
-      //   }
+      if (props.createObject) {
+        props.createObject(result.type, size, { x, y });
+      }
     }
   }
 };
@@ -44,11 +46,16 @@ class Area extends React.Component<Props> {
   }
 
   render() {
-    console.log('re-render');
-
     const { width, height, connectDropTarget } = this.props;
 
-    return connectDropTarget && connectDropTarget(<div style={{ width, height, boxSizing: 'border-box' }} />);
+    return (
+      connectDropTarget &&
+      connectDropTarget(
+        <div style={{ width, height, boxSizing: 'border-box' }}>
+          {this.props.objects.map(props => <AreaObject key={props.id} {...props} />)}
+        </div>
+      )
+    );
   }
 }
 
@@ -58,9 +65,7 @@ const DndArea = DropTarget([dropTypes.move, dropTypes.new], target, (connect, mo
   canDrop: monitor.canDrop()
 }))(Area);
 
-export default DndArea;
-
-// export default connect(
-//   (state: State.IRoot) => state.boxEditor,
-//   actionsCreator
-// )(DndArea);
+export default connect(
+  (state: State.IRoot) => state.boxEditor,
+  actionsCreator
+)(DndArea);

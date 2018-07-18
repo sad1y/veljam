@@ -7,7 +7,7 @@ import { objectKind } from '../constants';
 export default () => {
   return (
     <ControlList>
-      <Control icon={<Box size={30} />} type={objectKind.box} size={{ width: 50, height: 50 }} name="box" />
+      <Control icon={<Box size={30} />} type={objectKind.box} size={{ width: 50, height: 50 }} />
     </ControlList>
   );
 };
