@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from 'react-dnd';
+import { IViewportState } from 'components/viewport';
 import constants from '../constants';
 
 interface IProps {
@@ -10,6 +11,7 @@ interface IProps {
   isOver?: boolean;
   connectDropTarget?: ConnectDropTarget;
   onDrop: (item: any) => void;
+  getViewportContext: () => IViewportState;
 }
 
 const target = {
@@ -19,17 +21,22 @@ const target = {
     const initSourceClientOffset = monitor.getInitialSourceClientOffset();
     const sourceClientOffset = monitor.getSourceClientOffset();
     const differenceFromInitialOffset = monitor.getDifferenceFromInitialOffset();
-    
+
     // console.log({ clientOffset, initClientOffset, initSourceClientOffset, sourceClientOffset, differenceFromInitialOffset });
 
     console.log(monitor.getItem());
-    
+    console.log(props.getViewportContext());
     // props.onDrop(monitor.getItem());
   }
 };
 
 class Area extends React.Component<IProps> {
+  shouldComponentUpdate(nextProps) {
+    return !nextProps.isOver;
+  }
+
   render() {
+    console.log('re-render');
     const { width, height, connectDropTarget } = this.props;
 
     return connectDropTarget && connectDropTarget(<div style={{ width, height, boxSizing: 'border-box' }} />);

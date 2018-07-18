@@ -11,7 +11,7 @@ interface IProps {
   contentHeight: number;
 }
 
-interface IState {
+export interface IViewportState {
   width: number;
   height: number;
   scrollLeft: number;
@@ -25,9 +25,21 @@ interface IViewProps {
   offset: number;
 }
 
+export const ViewportContext = React.createContext({
+  getContext: () => ({
+    height: 0,
+    mousePosition: { x: 0, y: 0 },
+    offset: { x: 0, y: 0 },
+    scale: 1,
+    scrollLeft: 0,
+    scrollTop: 0,
+    width: 0
+  })
+});
+
 const rulerSize = 20;
 
-export default class Layout extends React.Component<IProps, IState> {
+export class Layout extends React.Component<IProps, IViewportState> {
   constructor(props: IProps) {
     super(props);
 
@@ -36,6 +48,7 @@ export default class Layout extends React.Component<IProps, IState> {
 
   scrollEl: HTMLElement;
   viewportEl: HTMLElement;
+  contextValue;
 
   state = {
     width: 0,
@@ -122,6 +135,11 @@ export default class Layout extends React.Component<IProps, IState> {
     return nextRouned === currentRounded ? nextScale : nextRouned;
   };
 
+  getContext = () => {
+    this.contextValue = this.contextValue || { getContext: () => ({ ...this.state }) };
+    return this.contextValue;
+  };
+
   zoomIn = (_event, delta: number = 1.12) => {
     this.setState(state => {
       const newScale = this.getAdjustedScale(state.scale, delta);
@@ -183,7 +201,7 @@ export default class Layout extends React.Component<IProps, IState> {
                 this.viewportEl = el;
               }}
             >
-              {this.props.children}
+              <ViewportContext.Provider value={this.getContext()}>{this.props.children}</ViewportContext.Provider>
             </Viewport>
           </ScrollContainer>
         </CursorTracker>
