@@ -1,33 +1,21 @@
+import { toColour } from '../utils';
+
 export const boxEditorInitState: State.IBoxEditor = {
-  panels: [
-    {
-      id: 1,
-      position: { x: 100, y: 400 },
-      type: 'ToolPanel'
-    }
-  ]
+  objects: []
 };
 
-type KnownActions = Actions.BoxEditor.IMovePanel;
+type KnownActions = Actions.BoxEditor.ICreateObject;
 
 const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEditor => {
   switch (action.type) {
-    case 'BoxEditor/MovePanel': {
-      const index = state.panels.findIndex(f => f.id === action.id);
-
-      if (index < 0) {
-        return state;
-      }
-
-      const el = state.panels[index];
-      const newPosition = {
-        x: el.position.x + action.delta.x,
-        y: el.position.y + action.delta.y
-      };
+    case 'BoxEditor/CreateObject': {
+      const objects = state.objects;
+      const newObj = { id: objects.length + 1, size: action.size, position: action.position, type: action.type, color: null };
+      newObj.color = toColour(JSON.stringify(newObj));
 
       return {
         ...state,
-        panels: [...state.panels.slice(0, index), { ...el, position: newPosition }, ...state.panels.slice(index + 1)]
+        objects: [...objects, newObj]
       };
     }
 

@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import actionCreators from '../actionsCreator';
 import PanelsHost from 'components/PanelHost';
 import ControlsPanel from './ControlsPanel';
 
 interface IProps {
-  onPositionChanged: (id: number, delta: IPosition) => any;
+  onPositionChanged?: (id: number, delta: IPosition) => any;
 }
 
 const PanelLayer = (props: IProps) => {
@@ -30,9 +28,4 @@ const PanelLayer = (props: IProps) => {
   );
 };
 
-export default connect(
-  (state: State.IRoot) => ({ panels: state.boxEditor.panels }),
-  {
-    onPositionChanged: actionCreators.movePanel
-  }
-)(PanelLayer);
+export default PanelLayer;

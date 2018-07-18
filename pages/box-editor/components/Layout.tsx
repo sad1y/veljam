@@ -12,13 +12,14 @@ class Layout extends React.Component {
       <Container>
         <DragDropContextProvider backend={HTML5Backend}>
           <Viewport contentWidth={780} contentHeight={930}>
-            <ViewportContext.Consumer>
+            {/* <ViewportContext.Consumer>
               {({ getContext }) => (
-                <Area width={780} height={930} onDrop={null} getViewportContext={getContext}>
-                  <InnerComponent />
-                </Area>
+                
               )}
-            </ViewportContext.Consumer>
+            </ViewportContext.Consumer> */}
+            <Area width={780} height={930} getViewportContext={null}>
+              <InnerComponent />
+            </Area>
           </Viewport>
           <PanelLayer />
         </DragDropContextProvider>
@@ -35,7 +36,9 @@ const InnerComponent = () => {
 
 const Container = styled.div`
   position: relative;
-  height: 100%;
-  width: 100%;
+  height: 500px;
+  width: 500px;
   overflow: hidden;
+  top: 100px;
+  left: 100px;
 `;

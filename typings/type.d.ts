@@ -1,4 +1,9 @@
 interface IPosition {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
+}
+
+interface ISize {
+  width: number;
+  height: number;
 }

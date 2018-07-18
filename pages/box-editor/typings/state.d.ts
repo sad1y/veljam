@@ -1,9 +1,11 @@
 declare namespace State {
   interface IBoxEditor {
-    panels: {
+    objects: {
       id: number;
       type: string;
       position: IPosition;
+      size: ISize;
+      color: string;
     }[];
   }
 }

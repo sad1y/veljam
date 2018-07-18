@@ -1,9 +1,10 @@
 export default {
-  movePanel: (id: number, delta: IPosition): Actions.BoxEditor.IMovePanel => {
+  createObject: (objectType: string, size: ISize, position: IPosition): Actions.BoxEditor.ICreateObject => {
     return {
-      id,
-      delta,
-      type: 'BoxEditor/MovePanel'
+      objectType,
+      size,
+      position,
+      type: 'BoxEditor/CreateObject'
     };
   }
 };

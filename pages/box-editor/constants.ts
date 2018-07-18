@@ -1,4 +1,8 @@
-export default {
-  NEW_BOX: 'NewBox',
-  MOVE_BOX: 'MoveBox'
+export const dropTypes = {
+  new: 'New',
+  move: 'Move'
+};
+
+export const objectKind = {
+  box: 'Box'
 };

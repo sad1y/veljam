@@ -1,7 +1,8 @@
 declare namespace Actions.BoxEditor {
-  interface IMovePanel {
-    type: 'BoxEditor/MovePanel';
-    id: number;
-    delta: IPosition;
+  interface ICreateObject {
+    type: 'BoxEditor/CreateObject';
+    objectType: string;
+    size: ISize;
+    position: IPosition;
   }
 }

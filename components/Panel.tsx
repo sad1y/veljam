@@ -31,7 +31,7 @@ const collect = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
 
 const headerStyle: React.CSSProperties = {
   margin: '-10px -10px 0 -10px',
-  padding: '10px',
+  padding: '8px 10px',
   cursor: 'move',
   backgroundColor: '#bbb'
 };
