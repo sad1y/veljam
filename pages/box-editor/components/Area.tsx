@@ -6,6 +6,7 @@ import { IViewportState } from 'components/viewport';
 import { dropTypes } from '../constants';
 import actionsCreator from '../actionsCreator';
 import Box from './Box';
+import { snapToGrid } from './utils';
 
 interface IOwnProps {
   width: number;
@@ -31,14 +32,15 @@ const target = {
     const size = result.size as ISize;
     const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale) - size.width / 2;
     const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale) - size.height / 2;
+    const coords = snapToGrid(x, y);
 
     if (result.id) {
       if (props.moveObject) {
-        props.moveObject(result.id, { x, y });
+        props.moveObject(result.id, coords);
       }
     } else {
       if (props.createObject) {
-        props.createObject(result.type, size, { x, y });
+        props.createObject(result.type, size, coords);
       }
     }
   }
