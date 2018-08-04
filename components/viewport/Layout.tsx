@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Ruler from './Ruler';
 import StatusPanel from './StatusPanel';
 import CursorTracker from 'react-cursor-position';
+const throttle = require('lodash/throttle');
 
 interface IProps {
   width?: number;
@@ -43,7 +44,7 @@ export class Layout extends React.Component<IProps, IViewportState> {
   constructor(props: IProps) {
     super(props);
 
-    this.scrollHandler = this.scrollHandler.bind(this);
+    this.scrollHandler = throttle(this.scrollHandler.bind(this), 20);
   }
 
   scrollEl: HTMLElement;
@@ -143,7 +144,7 @@ export class Layout extends React.Component<IProps, IViewportState> {
   zoomIn = (_event, delta: number = 1.12) => {
     this.setState(state => {
       const newScale = this.getAdjustedScale(state.scale, delta);
-      return { scale: newScale > 16 ? 16 : newScale };
+      return { scale: newScale > 40 ? 40 : newScale };
     });
   };
 
@@ -185,7 +186,7 @@ export class Layout extends React.Component<IProps, IViewportState> {
           scrollPosition={scrollTop}
           scale={scale}
         />
-        <CursorTracker shouldDecorateChildren={false} onPositionChanged={props => this.updateMousePosition(props.position)}>
+        <CursorTracker shouldDecorateChildren={false} onPositionChanged={props => this.updateMousePosition(props.position)}> 
           <ScrollContainer
             offset={rulerSize}
             innerRef={el => {

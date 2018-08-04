@@ -15,6 +15,7 @@ const tickHeights = [1.0, 0.6, 0.35, 0.25, 0.1, 0.075];
 const integerSubDivisors = [2.0, 5.0, 2.0];
 const majorDivisors = [2.0, 2.5, 2.0];
 const halfTickThickness = 0.5;
+const defaultSize = { width: 0, height: 0 };
 
 const subdivideX = (
   ctx: CanvasRenderingContext2D,
@@ -120,31 +121,33 @@ const renderHorizontalText = (ctx: CanvasRenderingContext2D, text: string, offse
 
 const renderRuler = (
   ctx: CanvasRenderingContext2D,
-  contentSize: number,
-  size: number,
+  viewportSize: number,
+  height: number,
   orientation: Orientation,
   scale: number,
-  offset: number
+  offset: number,
+  scrollPosition: number
 ) => {
   const dpu = 1;
   const subdivisions = null;
-  const originalPixelsSize = contentSize * scale;
   let division = 1.0;
   let majorSkipPower = 0;
   let majorDivisionPixels = dpu * scale;
   let start = -offset / scale / dpu - 1;
-  let end = (originalPixelsSize + offset / scale) / dpu + 1;
 
   while (majorDivisionPixels * division < 60.0) {
     division *= majorDivisors[majorSkipPower % majorDivisors.length];
     ++majorSkipPower;
   }
 
-  start = division * Math.floor(start / division);
+  const scrollOffset = scrollPosition / scale / dpu;
+
+  start = division * Math.floor((start + scrollOffset) / division);
+  const end = start + division + viewportSize / scale / dpu + 1;
 
   let index = start;
 
-  const fontSize = size / 2;
+  const fontSize = height / 2;
   ctx.font = fontSize + 'px Arial';
   ctx.textAlign = 'left';
 
@@ -153,9 +156,9 @@ const renderRuler = (
   const divisionInPixels = majorDivisionPixels * division;
 
   while (index <= end) {
-    const startDivPosition = index * majorDivisionPixels + offset;
+    const startDivPosition = index * majorDivisionPixels + offset - scrollPosition;
 
-    renderTicks(ctx, startDivPosition, size - 1, divisionInPixels, division, -majorSkipPower, size - 1, 0, subdivisions);
+    renderTicks(ctx, startDivPosition, height - 1, divisionInPixels, division, -majorSkipPower, height - 1, 0, subdivisions);
     renderLabels(ctx, index.toString(), startDivPosition, fontSize);
 
     index += division;
@@ -163,28 +166,29 @@ const renderRuler = (
 };
 
 class Ruler extends React.Component<IProps> {
-  canvas: React.RefObject<HTMLCanvasElement>;
-
-  constructor(props) {
-    super(props);
-    this.canvas = React.createRef();
-  }
+  canvas = React.createRef<HTMLCanvasElement>();
+  container = React.createRef<HTMLDivElement>();
 
   draw(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
-    const { contentSize, height, orientation, scale, offsetSize } = this.props;
-    ctx.clearRect(0, 0, offsetSize, offsetSize);
+    const { height, orientation, scale, offsetSize, scrollPosition } = this.props;
+    const size = this.container.current ? this.container.current.getBoundingClientRect() : defaultSize;
+    const viewportSize = orientation === 'Horizontal' ? size.width : size.height;
+
+    if (!viewportSize) return;
+
+    ctx.clearRect(0, 0, viewportSize, viewportSize);
 
     ctx.beginPath();
 
-    renderRuler(ctx, contentSize, height, orientation, scale, offsetSize);
+    renderRuler(ctx, viewportSize, height, orientation, scale, offsetSize, scrollPosition);
 
     if (orientation === 'Horizontal') {
       ctx.moveTo(0, height - halfTickThickness);
-      ctx.lineTo(offsetSize * 2 + contentSize * scale, height - halfTickThickness);
+      ctx.lineTo(viewportSize, height - halfTickThickness);
     } else {
       ctx.moveTo(height - halfTickThickness, 0);
-      ctx.lineTo(height - halfTickThickness, offsetSize * 2 + contentSize * scale);
+      ctx.lineTo(height - halfTickThickness, viewportSize);
     }
 
     ctx.stroke();
@@ -199,7 +203,8 @@ class Ruler extends React.Component<IProps> {
       this.props.contentSize === prevProps.contentSize &&
       this.props.height === prevProps.height &&
       this.props.offsetSize === prevProps.offsetSize &&
-      this.props.scale === prevProps.scale
+      this.props.scale === prevProps.scale &&
+      this.props.scrollPosition === prevProps.scrollPosition
     ) {
       return;
     }
@@ -208,23 +213,21 @@ class Ruler extends React.Component<IProps> {
   }
 
   renderVertical() {
-    const { contentSize, offsetSize, height, scale } = this.props;
-    const style = { marginTop: -this.props.scrollPosition + 'px' };
+    const size = this.container.current ? this.container.current.getBoundingClientRect() : { height: 0 };
 
     return (
-      <VerticalRuler size={height}>
-        <canvas ref={this.canvas} width={height} height={(offsetSize) * 2 + contentSize * scale} style={style} />
+      <VerticalRuler size={this.props.height} innerRef={this.container}>
+        <canvas ref={this.canvas} width={this.props.height} height={size.height} />
       </VerticalRuler>
     );
   }
 
   renderHorizontal() {
-    const { contentSize, offsetSize, height, scale } = this.props;
-    const style = { marginLeft: -this.props.scrollPosition + 'px' };
+    const size = this.container.current ? this.container.current.getBoundingClientRect() : { width: 0 };
 
     return (
-      <HorizontalRuler size={height}>
-        <canvas ref={this.canvas} width={(offsetSize) * 2 + contentSize * scale} height={height} style={style} />
+      <HorizontalRuler size={this.props.height} innerRef={this.container}>
+        <canvas ref={this.canvas} width={size.width} height={this.props.height} />
       </HorizontalRuler>
     );
   }
