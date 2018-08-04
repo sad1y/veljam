@@ -4,7 +4,7 @@ export const boxEditorInitState: State.IBoxEditor = {
   objects: []
 };
 
-type KnownActions = Actions.BoxEditor.ICreateObject;
+type KnownActions = Actions.BoxEditor.ICreateObject | Actions.BoxEditor.IMoveObject;
 
 const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEditor => {
   switch (action.type) {
@@ -19,11 +19,25 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
       };
     }
 
-    default:
-    // const ever: never = action;
+    case 'BoxEditor/MoveObject': {
+      return {
+        ...state,
+        objects: updateObjectById(action.id, { position: action.position })(state.objects)
+      };
+    }
   }
 
   return state;
+};
+
+const updateObjectById = (id: number, patch: Partial<IAreaObject>) => (objects: Array<IAreaObject>) => {
+  if (!objects) return [];
+
+  return objects.map(f => {
+    if (f.id !== id) return f;
+
+    return { ...f, ...patch };
+  });
 };
 
 export default reducer;

@@ -15,3 +15,9 @@ interface IAreaObject {
   size: ISize;
   color: string;
 }
+
+interface DragSourceProps {
+  connectDragSource?: ConnectDragSource;
+  isDragging?: boolean;
+  isDropped?: boolean;
+}

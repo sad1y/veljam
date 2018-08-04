@@ -5,7 +5,7 @@ import { DropTarget, ConnectDropTarget, DropTargetMonitor } from 'react-dnd';
 import { IViewportState } from 'components/viewport';
 import { dropTypes } from '../constants';
 import actionsCreator from '../actionsCreator';
-import AreaObject from './AreaObject';
+import Box from './Box';
 
 interface IOwnProps {
   width: number;
@@ -25,14 +25,18 @@ const target = {
 
     if (!result) return;
 
-    if (!result.id) {
-      const clientOffset = monitor.getClientOffset();
-      const areaBounds = (findDOMNode(component) as Element).getBoundingClientRect();
-      const viewport = props.getViewportContext();
-      const size = result.size as ISize;
-      const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale) - size.width / 2;
-      const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale) - size.height / 2;
+    const clientOffset = monitor.getClientOffset();
+    const areaBounds = (findDOMNode(component) as Element).getBoundingClientRect();
+    const viewport = props.getViewportContext();
+    const size = result.size as ISize;
+    const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale) - size.width / 2;
+    const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale) - size.height / 2;
 
+    if (result.id) {
+      if (props.moveObject) {
+        props.moveObject(result.id, { x, y });
+      }
+    } else {
       if (props.createObject) {
         props.createObject(result.type, size, { x, y });
       }
@@ -52,7 +56,7 @@ class Area extends React.Component<Props> {
       connectDropTarget &&
       connectDropTarget(
         <div style={{ width, height, boxSizing: 'border-box' }}>
-          {this.props.objects.map(props => <AreaObject key={props.id} {...props} />)}
+          {this.props.objects.map(props => <Box key={props.id} {...props} />)}
         </div>
       )
     );

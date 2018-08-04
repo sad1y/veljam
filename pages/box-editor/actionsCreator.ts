@@ -6,5 +6,12 @@ export default {
       position,
       type: 'BoxEditor/CreateObject'
     };
+  },
+  moveObject: (id: number, position: IPosition): Actions.BoxEditor.IMoveObject => {
+    return {
+      id,
+      position,
+      type: 'BoxEditor/MoveObject'
+    }
   }
 };

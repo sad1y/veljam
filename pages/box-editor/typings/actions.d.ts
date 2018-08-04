@@ -5,4 +5,10 @@ declare namespace Actions.BoxEditor {
     size: ISize;
     position: IPosition;
   }
+
+  interface IMoveObject {
+    type: 'BoxEditor/MoveObject';
+    id: number;
+    position: IPosition
+  }
 }

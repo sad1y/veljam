@@ -27,7 +27,7 @@ const prototypeSource = {
   }
 };
 
-class ToolsPanel extends React.Component<IProps> {
+class Control extends React.Component<IProps> {
   render() {
     const { type, icon, isDragging, connectDragSource } = this.props;
     const opacity = isDragging ? 0.4 : 1;
@@ -47,7 +47,7 @@ class ToolsPanel extends React.Component<IProps> {
 export default DragSource(dropTypes.new, prototypeSource, (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
-}))(ToolsPanel);
+}))(Control);
 
 const Icon = styled.div`
   width: 30px;
