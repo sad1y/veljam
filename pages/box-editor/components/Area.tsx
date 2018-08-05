@@ -2,7 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from 'react-dnd';
-import { IViewportState } from 'components/viewport';
 import { dropTypes } from '../constants';
 import actionsCreator from '../actionsCreator';
 import Box from './Box';
@@ -15,7 +14,7 @@ interface IOwnProps {
   lastDroppedItem?: any;
   isOver?: boolean;
   connectDropTarget?: ConnectDropTarget;
-  getViewportContext: () => IViewportState;
+  scale: number;
 }
 
 type Props = IOwnProps & State.IBoxEditor & typeof actionsCreator;
@@ -28,10 +27,10 @@ const target = {
 
     const clientOffset = monitor.getClientOffset();
     const areaBounds = (findDOMNode(component) as Element).getBoundingClientRect();
-    const viewport = props.getViewportContext();
+    const scale = props.scale;
     const size = result.size as ISize;
-    const x = Math.round((clientOffset.x + -areaBounds.left) / viewport.scale) - size.width / 2;
-    const y = Math.round((clientOffset.y + -areaBounds.top) / viewport.scale) - size.height / 2;
+    const x = Math.round((clientOffset.x - areaBounds.left) / scale) - size.width / 2;
+    const y = Math.round((clientOffset.y - areaBounds.top) / scale) - size.height / 2;
     const coords = snapToGrid(x, y);
 
     if (result.id) {
@@ -46,20 +45,35 @@ const target = {
   }
 };
 
+const getStyles = (props: IOwnProps) => {
+  const { scale } = props;
+
+  const style: React.CSSProperties = {
+    width: props.width + 'px',
+    height: props.height + 'px',
+    boxSizing: 'border-box',
+    transform:
+      `translate(
+      ${(props.width * (scale - 1)) / 2}px,
+      ${(props.height * (scale - 1)) / 2}px
+    ) ` + `scale(${scale})`
+  };
+
+  return style;
+};
+
 class Area extends React.Component<Props> {
-  shouldComponentUpdate(nextProps) {
-    return !nextProps.isOver;
+  shouldComponentUpdate(nextProps: Props) {
+    return nextProps.scale !== this.props.scale || !nextProps.isOver;
   }
 
   render() {
-    const { width, height, connectDropTarget } = this.props;
+    const { connectDropTarget } = this.props;
 
     return (
       connectDropTarget &&
       connectDropTarget(
-        <div style={{ width, height, boxSizing: 'border-box' }}>
-          {this.props.objects.map(props => <Box key={props.id} {...props} />)}
-        </div>
+        <div style={getStyles(this.props)}>{this.props.objects.map(props => <Box key={props.id} {...props} />)}</div>
       )
     );
   }

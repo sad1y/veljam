@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd';
-import { dropTypes } from '../constants';
+import { dropTypes, objectKind } from '../constants';
 
 type Props = IAreaObject & DragSourceProps;
 
@@ -8,15 +9,48 @@ const boxSource = {
   beginDrag(props: IAreaObject) {
     return {
       id: props.id,
-      size: props.size
+      size: props.size,
+      color: props.color,
+      position: props.position,
+      type: objectKind.box
     };
   }
 };
 
-class Box extends React.Component<Props> {
+export const Box = (props: { size: ISize; color: string; isDragging: boolean }) => {
+  const { size, color, isDragging } = props;
+  const opacity = isDragging ? 0.4 : 1;
+
+  return (
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+        backgroundColor: color || '#fff',
+        boxSizing: 'border-box',
+        border: '1px solid #444',
+        opacity
+      }}
+    />
+  );
+};
+
+export class DraggableBox extends React.Component<Props> {
+  componentDidMount() {
+    const { connectDragPreview } = this.props;
+    if (connectDragPreview) {
+      // Use empty image as a drag preview so browsers don't draw it
+      // and we can draw whatever we want on the custom drag layer instead.
+      connectDragPreview(getEmptyImage(), {
+        // IE fallback: specify that we'd rather screenshot the node
+        // when it already knows it's being dragged so we can hide it with CSS.
+        captureDraggingState: true
+      });
+    }
+  }
+
   render() {
-    const { size, position, color, isDragging, connectDragSource } = this.props;
-    const opacity = isDragging ? 0.4 : 1;
+    const { isDragging, size, color, position, connectDragSource } = this.props;
 
     return (
       connectDragSource &&
@@ -24,16 +58,12 @@ class Box extends React.Component<Props> {
         <div
           style={{
             position: 'absolute',
-            width: size.width,
-            height: size.height,
             top: position.y,
-            left: position.x,
-            backgroundColor: color,
-            boxSizing: 'border-box',
-            border: '1px solid #444',
-            opacity
+            left: position.x
           }}
-        />
+        >
+          <Box size={size} isDragging={isDragging} color={color} />
+        </div>
       )
     );
   }
@@ -41,5 +71,6 @@ class Box extends React.Component<Props> {
 
 export default DragSource(dropTypes.move, boxSource, (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
   connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging()
-}))(Box);
+  isDragging: monitor.isDragging(),
+  connectDragPreview: connect.dragPreview()
+}))(DraggableBox);

@@ -27,15 +27,13 @@ interface IViewProps {
 }
 
 export const ViewportContext = React.createContext({
-  getContext: () => ({
-    height: 0,
-    mousePosition: { x: 0, y: 0 },
-    offset: { x: 0, y: 0 },
-    scale: 1,
-    scrollLeft: 0,
-    scrollTop: 0,
-    width: 0
-  })
+  height: 0,
+  mousePosition: { x: 0, y: 0 },
+  offset: { x: 0, y: 0 },
+  scale: 1,
+  scrollLeft: 0,
+  scrollTop: 0,
+  width: 0
 });
 
 const rulerSize = 20;
@@ -136,11 +134,6 @@ export class Layout extends React.Component<IProps, IViewportState> {
     return nextRouned === currentRounded ? nextScale : nextRouned;
   };
 
-  getContext = () => {
-    this.contextValue = this.contextValue || { getContext: () => ({ ...this.state }) };
-    return this.contextValue;
-  };
-
   zoomIn = (_event, delta: number = 1.12) => {
     this.setState(state => {
       const newScale = this.getAdjustedScale(state.scale, delta);
@@ -186,7 +179,7 @@ export class Layout extends React.Component<IProps, IViewportState> {
           scrollPosition={scrollTop}
           scale={scale}
         />
-        <CursorTracker shouldDecorateChildren={false} onPositionChanged={props => this.updateMousePosition(props.position)}> 
+        <CursorTracker shouldDecorateChildren={false} onPositionChanged={props => this.updateMousePosition(props.position)}>
           <ScrollContainer
             offset={rulerSize}
             innerRef={el => {
@@ -202,7 +195,7 @@ export class Layout extends React.Component<IProps, IViewportState> {
                 this.viewportEl = el;
               }}
             >
-              <ViewportContext.Provider value={this.getContext()}>{this.props.children}</ViewportContext.Provider>
+              <ViewportContext.Provider value={{ ...this.state }}>{this.props.children}</ViewportContext.Provider>
             </Viewport>
           </ScrollContainer>
         </CursorTracker>
@@ -225,14 +218,6 @@ const Viewport = styled.div`
   display: inline-block;
   position: relative;
   background-color: #fff;
-
-  > * {
-    transform: translate(
-        ${props => (props.width * (props.scale - 1)) / 2}px,
-        ${props => (props.height * (props.scale - 1)) / 2}px
-      )
-      scale(${props => props.scale});
-  }
 `;
 
 const Frame = styled.div`

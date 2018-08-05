@@ -5,6 +5,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Layout as Viewport, ViewportContext } from 'components/viewport';
 import PanelLayer from './PanelLayer';
 import Area from './Area';
+import CustomDragLayer from './CustomDragLayer';
 
 class Layout extends React.Component {
   render() {
@@ -13,8 +14,15 @@ class Layout extends React.Component {
         <DragDropContextProvider backend={HTML5Backend}>
           <Viewport contentWidth={780} contentHeight={930}>
             <ViewportContext.Consumer>
-              {({ getContext }) => (
-                <Area width={780} height={930} getViewportContext={getContext} />
+              {state => (
+                <>
+                  <Area width={780} height={930} scale={state.scale} />
+                  <CustomDragLayer
+                    width={780}
+                    height={930}
+                    {...state}
+                  />
+                </>
               )}
             </ViewportContext.Consumer>
           </Viewport>
