@@ -49,6 +49,9 @@ class DragLayerImpl extends React.Component<CustomDragLayerProps> {
 
     const pos = snapToGrid(x, y);
 
+    pos.x = pos.x * scale + (size.width * scale - size.width) / 2;
+    pos.y = pos.y * scale + (size.height * scale - size.height) / 2;
+
     const transform = `translate(${pos.x}px, ${pos.y}px)`;
     return {
       transform,

@@ -9,8 +9,6 @@ interface Props {
 
 export default class SnapGrid extends React.PureComponent<Props> {
   render() {
-    console.log('render SnapGrid');
-
     let x = 0;
     let y = 0;
     const width = this.props.width * this.props.scale;
