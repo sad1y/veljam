@@ -8,12 +8,19 @@ interface ISize {
   height: number;
 }
 
+interface IArea {
+  name: string;
+  size: ISize;
+  objects: Array<IAreaObject>
+}
+
 interface IAreaObject {
   id: number;
   type: string;
   position: IPosition;
   size: ISize;
   color: string;
+  tags: string[];
 }
 
 interface DragSourceProps {

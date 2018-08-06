@@ -9,6 +9,27 @@ declare namespace Actions.BoxEditor {
   interface IMoveObject {
     type: 'BoxEditor/MoveObject';
     id: number;
-    position: IPosition
+    position: IPosition;
+  }
+
+  interface ISelectBox {
+    type: 'BoxEditor/SelectBox';
+    id: number;
+  }
+
+  interface ISelectLayout {
+    type: 'BoxEditor/SelectLayout';
+  }
+
+  interface IUpdateLayout {
+    type: 'BoxEditor/UpdateLayout';
+    size: ISize;
+    name: string;
+  }
+
+  interface IUpdateBox {
+    type: 'BoxEditor/UpdateBox';
+    // size: ISize;
+    tags: string[];
   }
 }
