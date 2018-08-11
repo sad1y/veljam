@@ -2,7 +2,7 @@ import * as React from 'react';
 
 interface AutoUpdateInputProps {
   value: string | number;
-  name: string;
+  name: string | number;
   type?: string;
   onUpdate: (obj) => any;
 }
@@ -46,7 +46,7 @@ export default class AutoUpdateInput extends React.Component<AutoUpdateInputProp
   render() {
     return (
       <input
-        type={this.props.type}
+        type={this.props.type || 'text'}
         ref={ref => (this.input = ref)}
         onBlur={this.blurHandler}
         onChange={this.changeHandler}

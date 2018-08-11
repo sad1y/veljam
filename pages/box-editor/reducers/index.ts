@@ -69,16 +69,33 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
     }
 
     case 'BoxEditor/UpdateSelectedArea': {
+      if (state.selected.type !== 'area') return state;
       const patch = action.patch as any;
-      const name = patch.name || state.area.name;
-      const width = patch.width || state.area.size.width;
-      const height = patch.height || state.area.size.height;
+      const area = state.selected.object;
+      const name = patch.name || area.name;
+      const width = patch.width || area.size.width;
+      const height = patch.height || area.size.height;
 
-      const area = { ...state.area, name, size: { width, height } };
+      const updatedArea = { ...area, name, size: { width, height } };
 
       return {
         selected: { type: 'area', object: area },
-        area
+        area: updatedArea
+      };
+    }
+
+    case 'BoxEditor/UpdateSelectedBox': {
+      if (state.selected.type !== 'box') return state;
+      const patch = action.patch as any;
+      const box = state.selected.object;
+      const color = patch.color || box.color;
+      const tags = patch.tags || box.tags;
+
+      const updatedBox = { ...box, color, tags };
+
+      return {
+        selected: { type: 'box', object: updatedBox },
+        area: { ...state.area, objects: updateObjectById(box.id, updatedBox)(state.area.objects) }
       };
     }
   }

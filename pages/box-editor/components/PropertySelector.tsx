@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import actionsCreator from '../actionsCreator';
 import AreaPropsEditor from './AreaPropsEditor';
-// import BoxPropsEditor from './BoxPropsEditor';
+import BoxPropsEditor from './BoxPropsEditor';
 
 interface Props {
   selected: State.IBoxEditor['selected'];
@@ -17,9 +17,9 @@ const PropertySelector = ({ selected, updateArea, updateBox }: Props) => {
     case 'area': {
       return <AreaPropsEditor area={selected.object} onUpdate={updateArea} />;
     }
-    // case 'box': {
-    //   return <BoxPropsEditor box={selected.object} onUpdate={updateBox} />;
-    // }
+    case 'box': {
+      return <BoxPropsEditor box={selected.object} onUpdate={updateBox} />;
+    }
   }
 
   return null;

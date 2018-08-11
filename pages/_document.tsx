@@ -31,6 +31,10 @@ const Html = styled.html`
   height: 100%;
   width: 100%;
   font-family: monospace;
+
+  input {
+    font-family: monospace;
+  }
 `;
 
 const Body = styled.body`
