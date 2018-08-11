@@ -68,12 +68,20 @@ class Area extends React.Component<Props> {
   }
 
   render() {
-    const { connectDropTarget } = this.props;
+    const { connectDropTarget, area } = this.props;
+
+    if (!area) {
+      return null;
+    }
 
     return (
       connectDropTarget &&
       connectDropTarget(
-        <div style={getStyles(this.props)}>{this.props.objects.map(props => <Box key={props.id} {...props} />)}</div>
+        <div style={getStyles(this.props)} onClick={this.props.selectArea}>
+          {area.objects.map(props => (
+            <Box key={props.id} {...props} onClick={() => this.props.selectBox(props.id)} />
+          ))}
+        </div>
       )
     );
   }

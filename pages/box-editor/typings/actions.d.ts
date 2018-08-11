@@ -17,19 +17,22 @@ declare namespace Actions.BoxEditor {
     id: number;
   }
 
-  interface ISelectLayout {
-    type: 'BoxEditor/SelectLayout';
+  interface ISelectArea {
+    type: 'BoxEditor/SelectArea';
   }
 
-  interface IUpdateLayout {
-    type: 'BoxEditor/UpdateLayout';
-    size: ISize;
-    name: string;
+  interface IUpdateSelectedArea {
+    type: 'BoxEditor/UpdateSelectedArea';
+    patch: object;
   }
 
-  interface IUpdateBox {
-    type: 'BoxEditor/UpdateBox';
-    // size: ISize;
-    tags: string[];
+  interface IUpdateSelectedBox {
+    type: 'BoxEditor/UpdateSelectedBox';
+    patch: object;
+  }
+
+  interface IDeleteObject {
+    type: 'BoxEditor/DeleteObject';
+    id: number;
   }
 }

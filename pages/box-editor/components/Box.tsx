@@ -3,7 +3,7 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd';
 import { dropTypes, objectKind } from '../constants';
 
-type Props = IAreaObject & DragSourceProps;
+type Props = IAreaObject & DragSourceProps & { onClick: () => void };
 
 const boxSource = {
   beginDrag(props: IAreaObject) {
@@ -17,7 +17,7 @@ const boxSource = {
   }
 };
 
-export const Box = (props: { size: ISize; color: string; isDragging: boolean, scale?: number }) => {
+export const Box = (props: { size: ISize; color: string; isDragging: boolean; scale?: number }) => {
   const { size, color, isDragging } = props;
   const opacity = isDragging ? 0.4 : 1;
   const scale = props.scale || 1;
@@ -50,6 +50,12 @@ export class DraggableBox extends React.Component<Props> {
     }
   }
 
+  handleClick = e => {
+    e.stopPropagation();
+    this.props.onClick();
+    return false;
+  };
+
   render() {
     const { isDragging, size, color, position, connectDragSource } = this.props;
 
@@ -62,6 +68,7 @@ export class DraggableBox extends React.Component<Props> {
             top: position.y,
             left: position.x
           }}
+          onClick={this.handleClick}
         >
           <Box size={size} isDragging={isDragging} color={color} />
         </div>
