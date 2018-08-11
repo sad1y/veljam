@@ -34,8 +34,11 @@ const layerStyles: React.CSSProperties = {
 class DragLayerImpl extends React.Component<CustomDragLayerProps> {
   element = React.createRef<HTMLDivElement>();
 
-  getItemStyles(props: CustomDragLayerProps, size: ISize) {
-    const { initialOffset, currentOffset, clientOffset } = props;
+  getItemStyles() {
+    // props: CustomDragLayerProps, size: ISize
+    const { item, scale, initialOffset, currentOffset, clientOffset } = this.props;
+    const size = item ? item.size : 0;
+
     if (!initialOffset || !currentOffset || !this.element.current) {
       return {
         display: 'none'
@@ -43,14 +46,13 @@ class DragLayerImpl extends React.Component<CustomDragLayerProps> {
     }
 
     const bounds = this.element.current.getBoundingClientRect();
-    const scale = props.scale;
     const x = Math.round((clientOffset.x - bounds.left) / scale) - size.width / 2;
     const y = Math.round((clientOffset.y - bounds.top) / scale) - size.height / 2;
 
     const pos = snapToGrid(x, y);
 
-    pos.x = pos.x * scale + (size.width * scale - size.width) / 2;
-    pos.y = pos.y * scale + (size.height * scale - size.height) / 2;
+    pos.x = pos.x * scale; // + (size.width * scale - size.width) / 2;
+    pos.y = pos.y * scale; // + (size.height * scale - size.height) / 2;
 
     const transform = `translate(${pos.x}px, ${pos.y}px)`;
     return {
@@ -59,25 +61,27 @@ class DragLayerImpl extends React.Component<CustomDragLayerProps> {
     };
   }
 
+  renderItem() {
+    const { scale, item } = this.props;
+
+    switch (item.type) {
+      case objectKind.box: {
+        return <Box color={item.color} isDragging={false} size={item.size} scale={scale} />;
+      }
+      default:
+        return null;
+    }
+  }
+
   render() {
-    const { item, itemType, isDragging } = this.props;
+    const { itemType, isDragging } = this.props;
     if (!(isDragging && (itemType === dropTypes.move || itemType === dropTypes.new))) {
       return null;
     }
 
-    function renderItem() {
-      switch (item.type) {
-        case objectKind.box: {
-          return <Box color={item.color} isDragging={false} size={item.size} />;
-        }
-        default:
-          return null;
-      }
-    }
-
     return (
       <div style={layerStyles} ref={this.element}>
-        <div style={this.getItemStyles(this.props, item.size)}>{renderItem()}</div>
+        <div style={this.getItemStyles()}>{this.renderItem()}</div>
         <SnapGrid width={this.props.width} height={this.props.height} scale={this.props.scale} />
       </div>
     );

@@ -17,15 +17,16 @@ const boxSource = {
   }
 };
 
-export const Box = (props: { size: ISize; color: string; isDragging: boolean }) => {
+export const Box = (props: { size: ISize; color: string; isDragging: boolean, scale?: number }) => {
   const { size, color, isDragging } = props;
   const opacity = isDragging ? 0.4 : 1;
+  const scale = props.scale || 1;
 
   return (
     <div
       style={{
-        width: size.width,
-        height: size.height,
+        width: size.width * scale,
+        height: size.height * scale,
         backgroundColor: color || '#fff',
         boxSizing: 'border-box',
         border: '1px solid #444',
