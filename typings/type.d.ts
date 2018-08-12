@@ -11,6 +11,7 @@ interface ISize {
 interface IArea {
   name: string;
   size: ISize;
+  dimension?: number;
   objects: Array<IAreaObject>;
 }
 

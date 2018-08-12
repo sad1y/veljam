@@ -5,6 +5,8 @@ export default ({ blocks }) => {
   return (
     <div>
       <BlockMarkup
+        row={1}
+        column={2}
         size={100}
         block={{
           isBlocked: false,

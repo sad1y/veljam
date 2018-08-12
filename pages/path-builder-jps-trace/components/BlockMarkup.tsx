@@ -4,6 +4,8 @@ import styled from 'styled-components';
 interface BlockProps {
   block: JPSBlock;
   size: number;
+  row: number;
+  column: number;
 }
 
 export default (props: BlockProps) => {
@@ -12,7 +14,7 @@ export default (props: BlockProps) => {
   }
 
   return (
-    <Block size={props.size}>
+    <Block {...props}>
       <Label size={props.size}>{props.block.jumpDistance['LeftUp']}</Label>
       <Label size={props.size}>{props.block.jumpDistance['Up']}</Label>
       <Label size={props.size}>{props.block.jumpDistance['RightUp']}</Label>
@@ -31,6 +33,9 @@ const Block = styled.div`
   height: ${(props: { size: number }) => props.size}px;
   box-shadow: inset 0px 0px 0 0.5px rgba(0, 0, 0, 0.5);
   background-color: ${(props: any) => (props.isBlocked ? '#000' : '#fff')};
+  position: absolute;
+  left: ${(props: any) => props.size * props.column}px;
+  top: ${(props: any) => props.size * props.row}px;
   flex-wrap: wrap;
   display: flex;
 `;
