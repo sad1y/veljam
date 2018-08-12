@@ -1,33 +1,25 @@
 export const jpsTraceInitState: State.JPSTarceState = {
   area: null,
-  blocks: []
+  blocks: null
 };
 
 type KnownActions = Actions.JPSTrace.SelectArea;
 
-const reducer = (state = jpsTraceInitState, action: KnownActions): State.IBoxEditor => {
+const reducer = (state = jpsTraceInitState, action: KnownActions): State.JPSTarceState => {
   switch (action.type) {
-    case 'BoxEditor/CreateObject': {
-      if (!state.area) return state;
-
-      const objects = state.area.objects;
-      const newObj = {
-        id: state.area.objects.length + 1,
-        size: action.size,
-        position: action.position,
-        type: action.type,
-        color: null,
-        tags: []
-      };
-
-      newObj.color = toColour(JSON.stringify(newObj));
+    case 'JPSTrace/SelectArea': {
+      if (!action.area) {
+        return jpsTraceInitState;
+      }
 
       return {
-        ...state,
-        area: { ...state.area, objects: [...objects, newObj] }
+        area: action.area,
+        blocks: null // calculateJPSBlocks(action.area)
       };
     }
   }
 
   return state;
 };
+
+export default reducer;

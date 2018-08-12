@@ -1,5 +1,6 @@
 declare namespace Actions.JPSTrace {
-    interface SelectArea {
-        area: IArea;
-    }
+  interface SelectArea {
+    type: 'JPSTrace/SelectArea';
+    area: IArea;
+  }
 }
