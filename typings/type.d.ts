@@ -11,7 +11,7 @@ interface ISize {
 interface IArea {
   name: string;
   size: ISize;
-  objects: Array<IAreaObject>
+  objects: Array<IAreaObject>;
 }
 
 interface IAreaObject {
@@ -28,4 +28,16 @@ interface DragSourceProps {
   isDragging?: boolean;
   isDropped?: boolean;
   connectDragPreview?: ConnectDragPreview;
+}
+
+interface Field {
+  size: ISize;
+  blocked: boolean[][];
+}
+
+type JPSDirection = 'Left' | 'Right' | 'Up' | 'Down' | 'LeftUp' | 'LeftDown' | 'RightDown' | 'RightUp';
+
+interface JPSBlock {
+  isBlocked: boolean;
+  jumpDistance: { [k in JPSDirection]: number };
 }
