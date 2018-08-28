@@ -94,6 +94,6 @@ const DndArea = DropTarget([dropTypes.move, dropTypes.new], target, (connect, mo
 }))(Area);
 
 export default connect(
-  (state: State.IRoot) => state.boxEditor,
+  (state: State.Root) => state.boxEditor,
   actionsCreator
 )(DndArea);

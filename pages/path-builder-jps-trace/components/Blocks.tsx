@@ -1,27 +1,35 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
 import BlockMarkup from './BlockMarkup';
 
-export default ({ blocks }) => {
-  return (
-    <div>
-      <BlockMarkup
-        row={1}
-        column={2}
-        size={100}
-        block={{
-          isBlocked: false,
-          jumpDistance: {
-            Down: 1,
-            Left: 2,
-            LeftDown: 3,
-            LeftUp: 4,
-            Right: 5,
-            RightDown: 6,
-            RightUp: 7,
-            Up: 9
-          }
-        }}
-      />
-    </div>
-  );
-};
+interface BlocksProps {
+  dimension: number;
+  blocks: JPSBlock[][];
+}
+
+class Blocks extends React.Component<BlocksProps> {
+  *renderBlocks() {
+    const blocks = this.props.blocks;
+    const dimension = this.props.dimension;
+
+    if (!blocks) return [];
+
+    for (let row = 0; row < blocks.length; row++) {
+      const columns = blocks[row];
+      for (let column = 0; column < columns.length; column++) {
+        const cell = columns[column];
+
+        yield <BlockMarkup row={row} column={column} size={dimension} block={cell} />;
+      }
+    }
+  }
+
+  render() {
+    return <>{this.renderBlocks()}</>;
+  }
+}
+
+export default connect((state: State.Root) => ({
+  dimension: state.pathJpsTrace.area.dimension || 100,
+  blocks: state.pathJpsTrace.blocks
+}))(Blocks);

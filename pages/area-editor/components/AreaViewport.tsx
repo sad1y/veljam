@@ -26,4 +26,4 @@ const AreaViewport = (props: ConnectedViewportProps) => {
   );
 };
 
-export default connect((state: State.IRoot) => ({ area: state.boxEditor.area }))(AreaViewport);
+export default connect((state: State.Root) => ({ area: state.boxEditor.area }))(AreaViewport);

@@ -1,14 +1,11 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import Blocks from './components/Blocks';
 
-const Layout = (props: State.JPSTarceState) => {
+export default () => {
   return (
     <div>
       {/* <AreaSelector /> */}
-      <Blocks blocks={props.blocks} />
+      <Blocks />
     </div>
   );
 };
-
-export default connect((state: State.IRoot) => state.pathJpsTrace)(Layout);

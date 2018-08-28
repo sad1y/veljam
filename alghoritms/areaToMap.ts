@@ -27,7 +27,7 @@ export default (area: IArea) => {
     }
   }
 
-  const objects = area.objects;
+  const objects = area.objects || [];
 
   for (let i = 0; i < objects.length; i++) {
     const element = objects[i];
@@ -37,4 +37,6 @@ export default (area: IArea) => {
 
     map[row][column].isBlocked = true;
   }
+
+  return map;
 };

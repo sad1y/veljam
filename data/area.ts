@@ -1,4 +1,4 @@
-const area: IArea = {
+let initArea: IArea = {
   name: 'unknown',
   size: {
     height: 2000,
@@ -7,4 +7,8 @@ const area: IArea = {
   objects: []
 };
 
-export { area };
+export const getArea = () => initArea;
+
+export const setArea = (area: IArea) => {
+  initArea = area;
+};

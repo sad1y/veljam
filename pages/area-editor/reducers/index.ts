@@ -1,9 +1,9 @@
 import { toColour } from '../utils';
-import { area } from '../../../data/area';
+import { getArea } from '../../../data/area';
 
 export const boxEditorInitState: State.IBoxEditor = {
-  area: area,
-  selected: { type: 'area', object: area }
+  area: getArea(),
+  selected: { type: 'area', object: getArea() }
 };
 
 type KnownActions =

@@ -1,5 +1,5 @@
 declare namespace State {
-    interface IRoot {
+    interface Root {
         boxEditor: IBoxEditor;
         pathJpsTrace: JPSTarceState;
     }

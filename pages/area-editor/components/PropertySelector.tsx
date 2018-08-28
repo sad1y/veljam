@@ -26,7 +26,7 @@ const PropertySelector = ({ selected, updateArea, updateBox }: Props) => {
 };
 
 export default connect(
-  (state: State.IRoot) => ({
+  (state: State.Root) => ({
     selected: state.boxEditor.selected
   }),
   {
