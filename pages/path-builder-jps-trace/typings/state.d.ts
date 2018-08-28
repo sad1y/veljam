@@ -1,6 +1,7 @@
 declare namespace State {
   interface JPSTarceState {
-    area: IArea;
+    selectedArea: IArea;
+    areas: IArea[];
     blocks: JPSBlock[][];
   }
 }

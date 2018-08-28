@@ -8,20 +8,24 @@ interface BlocksProps {
 }
 
 class Blocks extends React.Component<BlocksProps> {
-  *renderBlocks() {
+  renderBlocks() {
     const blocks = this.props.blocks;
     const dimension = this.props.dimension;
 
     if (!blocks) return [];
+
+    const result = [];
 
     for (let row = 0; row < blocks.length; row++) {
       const columns = blocks[row];
       for (let column = 0; column < columns.length; column++) {
         const cell = columns[column];
 
-        yield <BlockMarkup row={row} column={column} size={dimension} block={cell} />;
+        result.push(<BlockMarkup key={`${row}_${column}`} row={row} column={column} size={dimension} block={cell} />);
       }
     }
+
+    return result;
   }
 
   render() {
@@ -30,6 +34,6 @@ class Blocks extends React.Component<BlocksProps> {
 }
 
 export default connect((state: State.Root) => ({
-  dimension: state.pathJpsTrace.area.dimension || 100,
+  dimension: state.pathJpsTrace.selectedArea ? state.pathJpsTrace.selectedArea.dimension || 100 : 0,
   blocks: state.pathJpsTrace.blocks
 }))(Blocks);
