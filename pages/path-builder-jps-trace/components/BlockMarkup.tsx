@@ -10,39 +10,42 @@ interface BlockProps {
 
 export default (props: BlockProps) => {
   if (!props.block || props.block.isBlocked) {
-    return <Block isBlocked={true} />;
+    return <Block style={createBlockStyle(props)} />;
   }
-
+  const labelStyle = createLabelStyle(props.size);
   return (
-    <Block {...props}>
-      <Label size={props.size}>{props.block.jumpDistance['LeftUp']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['Up']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['RightUp']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['Left']}</Label>
-      <Label size={props.size} />
-      <Label size={props.size}>{props.block.jumpDistance['Right']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['LeftDown']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['Down']}</Label>
-      <Label size={props.size}>{props.block.jumpDistance['RightDown']}</Label>
+    <Block style={createBlockStyle(props)}>
+      <div style={labelStyle}>{props.block.jumpDistance['LeftUp']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['Up']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['RightUp']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['Left']}</div>
+      <div style={labelStyle} />
+      <div style={labelStyle}>{props.block.jumpDistance['Right']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['LeftDown']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['Down']}</div>
+      <div style={labelStyle}>{props.block.jumpDistance['RightDown']}</div>
     </Block>
   );
 };
 
+const createBlockStyle = (props: BlockProps) => ({
+  backgroundColor: props.block.isBlocked ? '#000' : '#fff',
+  left: `${props.size * props.column}px`,
+  top: `${props.size * props.row}px`,
+  width: props.size,
+  height: props.size
+});
+
+const createLabelStyle = (size: number): React.CSSProperties => ({
+  flex: `1 1 ${(size || 0) / 3}px`,
+  height: `${(size || 0) / 3}px`,
+  textAlign: 'center',
+  lineHeight: `${(size || 0) / 3}px`
+});
+
 const Block = styled.div`
-  width: ${(props: { size: number }) => props.size}px;
-  height: ${(props: { size: number }) => props.size}px;
   box-shadow: inset 0px 0px 0 0.5px rgba(0, 0, 0, 0.5);
-  background-color: ${(props: any) => (props.isBlocked ? '#000' : '#fff')};
   position: absolute;
-  left: ${(props: any) => props.size * props.column}px;
-  top: ${(props: any) => props.size * props.row}px;
   flex-wrap: wrap;
   display: flex;
-`;
-
-const Label = styled.div`
-  flex: 1 1 ${(props: { size?: number }) => (props.size || 0) / 3}px;
-  height: ${(props: { size?: number }) => (props.size || 0) / 3}px;
-  text-align: center;
-  line-height: ${(props: { size?: number }) => (props.size || 0) / 3}px;
 `;

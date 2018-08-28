@@ -29,7 +29,7 @@ export default connect(
 )(AreaSelector);
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   opacity: 0.5;
