@@ -1,5 +1,5 @@
 import { getArea } from '../../../data/area';
-import areaToMap from '../../../alghoritms/areaToMap';
+import areaToMap from '../../../alghoritms/areaToJumpPointMap';
 
 export const jpsTraceInitState: State.JPSTarceState = {
   selectedArea: null,
