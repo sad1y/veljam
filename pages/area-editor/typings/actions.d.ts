@@ -35,4 +35,9 @@ declare namespace Actions.BoxEditor {
     type: 'BoxEditor/DeleteObject';
     id: number;
   }
+
+  interface ISaveArea {
+    type: 'AreaEditor/Save';
+    name: string;
+  }
 }

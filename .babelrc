@@ -9,7 +9,8 @@
       {
         "root": ["./"],
         "alias": {
-          "components": "./components"
+          "components": "./components",
+          "alghoritms": "./alghoritms"
         }
       }
     ]

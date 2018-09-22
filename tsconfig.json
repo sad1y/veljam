@@ -24,6 +24,9 @@
       "data/*": [
         "./data/*"
       ],
+      "alghoritms/*": [
+        "./alghoritms/*"
+      ],
     },
     "lib": [
       "dom",

@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import BlockMarkup from './BlockMarkup';
+import areaToMap from 'alghoritms/areaToJumpPointMap';
 
 interface BlocksProps {
-  dimension: number;
-  blocks: JPSBlock[][];
+  area: IArea;
 }
 
 class Blocks extends React.Component<BlocksProps> {
   renderBlocks() {
-    const blocks = this.props.blocks;
-    const dimension = this.props.dimension;
+    const area = this.props.area;
+    if (!area) return [];
+    const blocks = areaToMap(area);
+    const dimension = area.dimension || 100;
 
     if (!blocks) return [];
 
@@ -34,6 +36,5 @@ class Blocks extends React.Component<BlocksProps> {
 }
 
 export default connect((state: State.Root) => ({
-  dimension: state.pathJpsTrace.selectedArea ? state.pathJpsTrace.selectedArea.dimension || 100 : 0,
-  blocks: state.pathJpsTrace.blocks
+  area: state.areasEditor.current
 }))(Blocks);

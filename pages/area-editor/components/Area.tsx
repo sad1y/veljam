@@ -68,9 +68,9 @@ class Area extends React.Component<Props> {
   }
 
   render() {
-    const { connectDropTarget, area } = this.props;
+    const { connectDropTarget, current } = this.props;
 
-    if (!area) {
+    if (!current) {
       return null;
     }
 
@@ -78,7 +78,7 @@ class Area extends React.Component<Props> {
       connectDropTarget &&
       connectDropTarget(
         <div style={getStyles(this.props)} onClick={this.props.selectArea}>
-          {area.objects.map(props => (
+          {current.objects.map(props => (
             <Box key={props.id} {...props} onClick={() => this.props.selectBox(props.id)} />
           ))}
         </div>
@@ -94,6 +94,6 @@ const DndArea = DropTarget([dropTypes.move, dropTypes.new], target, (connect, mo
 }))(Area);
 
 export default connect(
-  (state: State.Root) => state.boxEditor,
+  (state: State.Root) => state.areasEditor,
   actionsCreator
 )(DndArea);

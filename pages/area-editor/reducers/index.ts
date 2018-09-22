@@ -1,9 +1,17 @@
 import { toColour } from '../utils';
-import { getArea } from '../../../data/area';
+
+let initArea: IArea = {
+  name: 'unknown',
+  size: {
+    height: 2000,
+    width: 2000
+  },
+  objects: []
+};
 
 export const boxEditorInitState: State.IBoxEditor = {
-  area: getArea(),
-  selected: { type: 'area', object: getArea() }
+  current: { ...initArea },
+  selected: { type: 'area', object: { ...initArea } }
 };
 
 type KnownActions =
@@ -18,11 +26,11 @@ type KnownActions =
 const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEditor => {
   switch (action.type) {
     case 'BoxEditor/CreateObject': {
-      if (!state.area) return state;
+      if (!state.current) return state;
 
-      const objects = state.area.objects;
+      const objects = state.current.objects;
       const newObj = {
-        id: state.area.objects.length + 1,
+        id: state.current.objects.length + 1,
         size: action.size,
         position: action.position,
         type: action.type,
@@ -34,26 +42,26 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
 
       return {
         ...state,
-        area: { ...state.area, objects: [...objects, newObj] }
+        current: { ...state.current, objects: [...objects, newObj] }
       };
     }
 
     case 'BoxEditor/DeleteObject': {
       return {
         ...state,
-        area: { ...state.area, objects: state.area.objects.filter(f => f.id !== action.id) }
+        current: { ...state.current, objects: state.current.objects.filter(f => f.id !== action.id) }
       };
     }
 
     case 'BoxEditor/MoveObject': {
       return {
         ...state,
-        area: { ...state.area, objects: updateObjectById(action.id, { position: action.position })(state.area.objects) }
+        current: { ...state.current, objects: updateObjectById(action.id, { position: action.position })(state.current.objects) }
       };
     }
 
     case 'BoxEditor/SelectBox': {
-      const obj = state.area.objects.find(f => f.id === action.id);
+      const obj = state.current.objects.find(f => f.id === action.id);
 
       return {
         ...state,
@@ -64,7 +72,7 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
     case 'BoxEditor/SelectArea': {
       return {
         ...state,
-        selected: { type: 'area', object: state.area }
+        selected: { type: 'area', object: state.current }
       };
     }
 
@@ -80,7 +88,7 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
 
       return {
         selected: { type: 'area', object: area },
-        area: updatedArea
+        current: updatedArea
       };
     }
 
@@ -95,7 +103,7 @@ const reducer = (state = boxEditorInitState, action: KnownActions): State.IBoxEd
 
       return {
         selected: { type: 'box', object: updatedBox },
-        area: { ...state.area, objects: updateObjectById(box.id, updatedBox)(state.area.objects) }
+        current: { ...state.current, objects: updateObjectById(box.id, updatedBox)(state.current.objects) }
       };
     }
   }

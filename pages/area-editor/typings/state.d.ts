@@ -1,6 +1,6 @@
 declare namespace State {
   interface IBoxEditor {
-    area: IArea;
+    current: IArea;
     selected: { type: 'area'; object: IArea } | { type: 'box'; object: IAreaObject };
   }
 }

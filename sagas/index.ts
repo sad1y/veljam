@@ -1,5 +1,5 @@
-import { delay } from 'redux-saga';
-import { all, call, put, take, takeLatest } from 'redux-saga/effects';
+// import { delay } from 'redux-saga';
+import { all } from 'redux-saga/effects';
 import es6promise from 'es6-promise';
 import 'isomorphic-unfetch';
 
