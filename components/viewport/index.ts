@@ -1,3 +1,3 @@
-import { ViewportContext, Layout, IViewportState } from './Layout';
+import { ViewportContext, Layout } from './Layout';
 
-export { ViewportContext, Layout, IViewportState };
+export { ViewportContext, Layout };
