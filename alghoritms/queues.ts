@@ -3,17 +3,25 @@ export interface PathFindigingNode {
   cost: number;
 }
 
-export const bucketPriorityQueue = (buckets: number, arraySize: number, division: number) => {};
-
-export class BucketPriorityQueue {
-  buckets: number;
+export class BucketPriorityQueue<T extends PathFindigingNode> {
+  bucketsCount: number;
   arraySize: number;
   division: number;
+  nextFreeBucket = 0;
+  maxFreeBuckets = 200;
+  freeBuckets: UnsortedPriorityQueue<T>[] = null;
 
-  constructor(buckets: number, arraySize: number, division: number) {
-    this.buckets = buckets;
+  constructor(bucketsCount: number, arraySize: number, division: number) {
+    this.bucketsCount = bucketsCount;
     this.arraySize = arraySize;
     this.division = division;
+
+    // alloc a bunch of free buckets
+    this.freeBuckets = new Array(this.maxFreeBuckets);
+
+    for (let i = 0; i < this.maxFreeBuckets; i++) {
+      this.freeBuckets[i] = new UnsortedPriorityQueue(arraySize);
+    }
   }
 }
 
